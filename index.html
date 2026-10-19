@@ -218,6 +218,16 @@ select.hgm{padding:6px 10px}
 .nfc svg{width:14px;height:14px}.nfc.sel{border-color:var(--ac);color:var(--ac);background:color-mix(in srgb,var(--ac) 10%,transparent)}.nft{color:var(--ac)}
 .nh b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#nup{padding:4px 8px 4px 0;gap:2px;flex:none}
 .nfr{display:flex;align-items:center;gap:10px}.nfr .fn{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nfr svg{flex:none;color:var(--ac)}.nfr svg:last-child{color:var(--mut);width:14px;height:14px}
+.ntl{width:100%;box-sizing:border-box;border:0;background:transparent;font-size:24px;font-weight:700;padding:2px 0 12px;border-radius:0}.ntl:focus{border:0;background:transparent}
+.nblocks{display:flex;flex-direction:column;gap:8px}
+.nrow{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);gap:6px;align-items:stretch}
+.nrow textarea{display:block;width:100%;box-sizing:border-box;resize:none;overflow:hidden;min-height:76px;line-height:1.55;font-size:16px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg)}
+.nrow textarea:focus{border-color:var(--ac)}
+.ngt{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px}
+.ngt button{width:28px;height:24px;padding:0;color:var(--mut);border-radius:6px}.ngt button:hover:not(:disabled){color:var(--ac)}.ngt button[data-a="rdel"]:hover{color:var(--bad)}
+.nhint{font-size:11px;color:var(--mut);text-align:center;margin-top:16px}
+@media(pointer:coarse){.nhint{display:none}}
+@media(max-width:820px){.ns{padding:10px 12px 40px}.nrow{grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);gap:4px}.nrow textarea{padding:8px}}
 </style></head><body>
 
 <div id="main"><div id="tlw"><div class="tlh"><div class="pgh"><h2>Timeline</h2><span class="sp"></span><button class="hb2" id="tdb" onclick="goToday()" title="Jump to today"></button><button class="hb2" id="ftb" title="Fit all unfinished tasks" onclick="fitAll()"></button><button class="hb2" id="rfb" title="Tidy up: schedule as early as possible and lay the dependency chains out as flowcharts" onclick="refresh()"></button><select id="tspan" class="pgsel" onchange="spanSel(this.value)" title="Zoom"><option value="">Zoom</option><option value="1">Day</option><option value="7">Week</option><option value="30">Month</option></select></div></div><div id="cv"><svg class="cvs" id="sv"></svg></div></div>
@@ -700,8 +710,8 @@ function gpace(h,mode){const g=h.goal;if(!g||!(g.m>0))return null;
  const days=mode==='a'?span:Math.min(+mode,span),from=now-days*DAY;
  let tot=0;for(const x of h.sessions)if(x.ts>=from)tot+=x.ms;
  return{ratio:tot/(days*g.m*MIN)}}
-const zc=hr=>hr>=6&&hr<=8?'var(--bad)':hr>=3&&hr<=5?'var(--ok)':'var(--ac)',pcol=r=>zc((((Math.round(Math.max(-150,Math.min(150,(r-1)*150))/30))%12)+12)%12||12);
-function gauge(q){let t='';for(let i=0;i<12;i++){const a=i*Math.PI/6,hr=i||12,c=zc(hr),qd=i%3===0;
+const zc=(hr,q)=>hr>=6&&hr<=7?'var(--bad)':hr>=4&&hr<=5?'var(--ok)':q?'var(--tx)':'var(--mut)',pcol=r=>zc((((Math.round(Math.max(-150,Math.min(150,(r-1)*150))/30))%12)+12)%12||12,1);
+function gauge(q){let t='';for(let i=0;i<12;i++){const a=i*Math.PI/6,hr=i||12,qd=i%3===0,c=zc(hr,qd);
   t+=`<line x1="${130+Math.sin(a)*(qd?96:104)}" y1="${130-Math.cos(a)*(qd?96:104)}" x2="${130+Math.sin(a)*114}" y2="${130-Math.cos(a)*114}" stroke="${c}" stroke-width="${qd?5:3}" stroke-linecap="round"/>`}
  const ang=q?Math.max(-150,Math.min(150,(q.ratio-1)*150)):-150;
  return `<svg class="hdial" viewBox="0 0 260 260"><circle cx="130" cy="130" r="126" fill="var(--bg)" stroke="var(--bd)" stroke-width="3"/>${t}<g transform="rotate(${ang} 130 130)" ${q?'':'opacity=".3"'}><line x1="130" y1="144" x2="130" y2="34" stroke="var(--tx)" stroke-width="4" stroke-linecap="round"/></g><circle cx="130" cy="130" r="6" fill="var(--ac)"/></svg>`}
@@ -851,11 +861,13 @@ function nLs(k){E().focus();const c=nCur(),l=c&&c.closest('ul,ol'),tag=k==='ol'?
  if(l&&nKind(l)===k)document.execCommand(tag);else{if(!l||(l.tagName==='OL')!==(k==='ol'))document.execCommand(tag);const c2=nCur(),l2=c2&&c2.closest('ul,ol');if(l2)l2.className=(k==='ds'||k==='cl')?k:''}nSave()}
 function nCmd(c){E().focus();if(c==='h'){const k=nCur(),h=k&&k.closest('h2');document.execCommand('formatBlock',false,h?'<div>':'<h2>')}else document.execCommand(c);nSave()}
 const nDl=n=>{const d=new Date(n.m);return d.getDate()+' '+NM[d.getMonth()]+' '+d.getFullYear()+' at '+p2(d.getHours())+':'+p2(d.getMinutes())};
-function nSave(){const n=nt(NS.sel),e=E();if(!n||n.del||!e.isContentEditable)return;nDir(e);const h=e.innerHTML;if(h===n.h)return;const L=nTxt(h);n.h=h;n.t=L[0]||'';n.p=L.slice(1).join(' ').slice(0,120);n.m=Date.now();$('ndate').textContent=nDl(n);clearTimeout(nTm);nTm=setTimeout(nFlush,500);nList()}
+function nCommit(n){const tl=($('ntl').value||'').trim(),flat=n.r.flatMap(r=>r.flatMap(x=>x.split('\n'))).map(x=>x.trim()).filter(Boolean);
+ n.t=tl;n.h=[tl,...flat].filter(Boolean).map(l=>'<div>'+esc(l)+'</div>').join('');n.p=flat.join(' ').slice(0,120);n.m=Date.now();$('ndate').textContent=nDl(n);clearTimeout(nTm);nTm=setTimeout(nFlush,500);nList()}
+function nSave(){const n=nt(NS.sel);if(n&&!n.del&&Array.isArray(n.r))nCommit(n)}
 function nFlush(){clearTimeout(nTm);nTm=0;save()}
 function nLeave(){const n=nt(NS.sel);if(n&&!n.del&&!nTxt(n.h).length&&!/<li/.test(n.h)){S.notes=S.notes.filter(x=>x!==n);NS.sel=null;save()}}
 function nOpen(id){nLeave();NS.sel=id;NS.v='e';nList();nEd()}
-function nNew(){nLeave();if(NS.f==='del')NS.f=V.nf='all';const t=Date.now(),id=nid();S.notes.push({id,h:'<div><br></div>',t:'',p:'',c:t,m:t,pin:false,del:0,f:nCf()});NS.q='';$('nq').value='';NS.sel=id;NS.v='e';save();nList();nEd();E().focus()}
+function nNew(){nLeave();if(NS.f==='del')NS.f=V.nf='all';const t=Date.now(),id=nid();S.notes.push({id,h:'',r:[['','']],t:'',p:'',c:t,m:t,pin:false,del:0,f:nCf()});NS.q='';$('nq').value='';NS.sel=id;NS.v='e';save();nList();nEd();$('ntl').focus()}
 function nGo(f){nLeave();NS.f=V.nf=f;NS.sel=null;NS.v='l';NS.q='';$('nq').value='';save();renderNotes()}
 function nUp(){const f=nCf()!==null?nt(NS.f):null;nGo(f&&f.f&&nt(f.f)&&nt(f.f).fd?f.f:'all')}
 function nAct(a){const n=nt(NS.sel);if(!n)return;
@@ -875,17 +887,35 @@ function nList(){const q=NS.q.trim().toLowerCase(),del=NS.f==='del',cf=nCf(),liv
   h+=`<div class="ni${n.id===NS.sel?' sel':''}" data-id="${n.id}"><div class="nt" dir="auto">${esc(n.t||'New Note')}</div><div class="np" dir="auto"><b>${nDt(n.m)}</b> ${fo}${esc(n.p||'No additional text')}</div></div>`}
  $('nrows').innerHTML=h||`<div class="m" style="padding:28px;text-align:center">${q?'No Results':del?'Nothing deleted':'No Notes'}</div>`;
  nChips()}
-function nEd(){const n=nt(NS.sel),e=E();$('nee').classList.toggle('empty',!n);$('nw').dataset.v=NS.v;if(!n){e.innerHTML='';NS.ld=0;return}
- if(NS.ld!==n.id||document.activeElement!==e){e.innerHTML=nSan(n.h);NS.ld=n.id}
- e.contentEditable=!n.del;$('nrec').style.display=n.del?'':'none';$('npin').style.display=n.del?'none':'';$('nmv').style.display=n.del?'none':'';$('npin').classList.toggle('pn',!!n.pin);$('ndate').textContent=nDl(n)}
+const nRowH=(r,i)=>`<div class="nrow"><textarea data-r="${i}" data-c="0" dir="auto" spellcheck="true">
+${esc(r[0]||'')}</textarea><div class="ngt"><button data-a="mvr" title="Send left block to the right (Ctrl+Enter)">${ic('chr')}</button><button data-a="mvl" title="Send right block to the left (Ctrl+Enter)">${ic('chl')}</button><button data-a="rdel" title="Delete row">${ic('x')}</button></div><textarea data-r="${i}" data-c="1" dir="auto" spellcheck="true">
+${esc(r[1]||'')}</textarea></div>`;
+function nFit(row){if(!row)return;const t=[...row.querySelectorAll('textarea')];t.forEach(x=>x.style.height='auto');const h=Math.max(76,...t.map(x=>x.scrollHeight+2));t.forEach(x=>x.style.height=h+'px')}
+const nFitAll=()=>{const e=E();if(e)e.querySelectorAll('.nrow').forEach(nFit)};
+/* notes written with the old rich-text editor: first line stays the title, every paragraph becomes a row */
+function nMig(n){const d=document.createElement('div');d.innerHTML=n.h||'';const B='div,p,li,h1,h2,h3,pre',L=[];d.querySelectorAll(B).forEach(e=>{if(!e.querySelector(B))L.push(e.textContent.trim())});
+ if(!L.length&&d.textContent.trim())L.push(d.textContent.trim());const fi=L.findIndex(x=>x),rest=fi<0?[]:L.slice(fi+1),rows=[];let g=[];
+ for(const l of rest){if(l)g.push(l);else if(g.length){rows.push([g.join('\n'),'']);g=[]}}if(g.length)rows.push([g.join('\n'),'']);return rows}
+const nrows=n=>{if(!Array.isArray(n.r))n.r=nMig(n);return n.r};
+function nBuild(n){const rows=nrows(n),e=E();if(!n.del&&(!rows.length||rows[rows.length-1].some(x=>x.trim())))rows.push(['','']);
+ $('ntl').value=n.t||'';e.innerHTML=rows.map(nRowH).join('');NS.ld=n.id;const ro=!!n.del;$('ntl').readOnly=ro;e.querySelectorAll('textarea').forEach(t=>t.readOnly=ro);nFitAll()}
+function nAddRow(n){n.r.push(['','']);const e=E();e.insertAdjacentHTML('beforeend',nRowH(['',''],n.r.length-1));nFit(e.lastElementChild)}
+function nMoveBlock(n,r,c,focus){const rows=n.r,a=rows[r][c],b=rows[r][1-c];if(!a.trim())return;rows[r][1-c]=b.trim()?b.replace(/\s+$/,'')+'\n'+a.replace(/\s+$/,''):a;rows[r][c]='';
+ const row=E().children[r],ta=row.querySelectorAll('textarea');ta[0].value=rows[r][0];ta[1].value=rows[r][1];nFit(row);if(rows[rows.length-1].some(x=>x.trim()))nAddRow(n);
+ if(focus){const x=ta[1-c];x.focus();x.setSelectionRange(x.value.length,x.value.length)}nCommit(n)}
+function nRowAct(a,b){const n=nt(NS.sel);if(!n||n.del)return;const row=b.closest('.nrow'),r=[...E().children].indexOf(row);if(r<0)return;
+ if(a==='mvr')nMoveBlock(n,r,0);else if(a==='mvl')nMoveBlock(n,r,1);
+ else{if((n.r[r][0]+n.r[r][1]).trim()&&!confirm('Delete this row?'))return;if(n.r.length>1)n.r.splice(r,1);else n.r[0]=['',''];nBuild(n);nCommit(n)}}
+function nEd(){const n=nt(NS.sel),e=E();$('nee').classList.toggle('empty',!n);$('nw').dataset.v=NS.v;if(!n){e.innerHTML='';$('ntl').value='';NS.ld=0;return}
+ const ae=document.activeElement,busy=ae&&(e.contains(ae)||ae===$('ntl'));if(NS.ld!==n.id||!busy)nBuild(n);
+ $('nrec').style.display=n.del?'':'none';$('npin').style.display=n.del?'none':'';$('nmv').style.display=n.del?'none':'';$('npin').classList.toggle('pn',!!n.pin);$('ndate').textContent=nDl(n)}
 function renderNotes(){const el=$('pgN');if(!el.firstChild)nInit(el);if(typeof NS.f==='number'){const f=nt(NS.f);if(!f||!f.fd)NS.f=V.nf='all'}const now=Date.now(),c0=S.notes.length;S.notes=S.notes.filter(n=>!(n.del&&now-n.del>30*DAY));
  if(NS.sel&&!nt(NS.sel))NS.sel=null;
  if(!NS.sel&&innerWidth>820){const del=NS.f==='del',cf=nCf(),l=S.notes.filter(n=>!n.fd&&!!n.del===del&&(del||nIn(n,cf))).sort((a,b)=>(b.pin|0)-(a.pin|0)||b.m-a.m)[0];if(l)NS.sel=l.id}
  if(S.notes.length!==c0)save();nList();nEd()}
 function nInit(el){el.innerHTML=`<div class="nw" id="nw" data-v="l"><div class="nl"><div class="nh"><button data-a="up" id="nup" style="display:none">${ic('chl')}<span>Notes</span></button><b id="nht" dir="auto">Notes</b><span class="sp"></span><button data-a="nf" id="nnf" title="New folder">${ic('folder')}</button><button data-a="fm" id="nfmb" title="Folder options" style="display:none">${ic('more')}</button><button data-a="new" id="nnn" title="New note">${ic('nw')}</button></div><input class="nq" id="nq" type="search" dir="auto" placeholder="Search"><div class="nr" id="nrows"></div></div>
 <div class="ne" id="nee"><div class="nb"><button class="nbk" data-a="back">${ic('chl')}<span>Notes</span></button><span class="sp"></span><button data-a="rec" id="nrec" title="Recover">${ic('rec')}</button><button data-a="mv" id="nmv" title="Move to folder">${ic('folder')}</button><button data-a="pin" id="npin" title="Pin">${ic('pin')}</button><button data-a="del" title="Delete">${ic('trash')}</button></div>
-<div class="nf"><button data-c="bold"><b>B</b></button><button data-c="italic"><i>I</i></button><button data-c="underline"><u>U</u></button><button data-c="strikeThrough"><s>S</s></button><button data-c="h">H</button><button data-l="ul">${ic('ul')}</button><button data-l="ds">${ic('ds')}</button><button data-l="ol">${ic('ol')}</button><button data-l="cl">${ic('chk')}</button></div>
-<div class="ns"><div class="nd" id="ndate"></div><div class="ned" id="ned" contenteditable="true" spellcheck="true"></div></div><div class="nem">No Note Selected</div></div></div>`;
+<div class="ns"><div class="nd" id="ndate"></div><input class="ntl" id="ntl" dir="auto" placeholder="Title" autocomplete="off"><div class="nblocks" id="ned"></div><div class="nhint">Enter: new line · Tab: block below · Shift+Tab: block above · Ctrl+Enter: send to the neighbour block</div></div><div class="nem">No Note Selected</div></div></div>`;
  el.addEventListener('mousedown',e=>{if(e.target.closest('.nf'))e.preventDefault()});
  el.addEventListener('click',e=>{const li=e.target.closest('#ned li');
   if(li&&li.parentNode.classList.contains('cl')&&E().isContentEditable){const r=li.getBoundingClientRect(),x=li.parentNode.dir==='rtl'?r.right-e.clientX:e.clientX-r.left;if(x<30){e.preventDefault();li.toggleAttribute('data-c');nSave();return}}
@@ -893,14 +923,24 @@ function nInit(el){el.innerHTML=`<div class="nw" id="nw" data-v="l"><div class="
   const r=e.target.closest('.ni');if(r){nOpen(+r.dataset.id);return}
   const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;
   if(b.dataset.c)nCmd(b.dataset.c);else if(b.dataset.l)nLs(b.dataset.l);else if(a==='new')nNew();
-  else if(a==='up')nUp();
+  else if(a==='up')nUp();else if(a==='mvr'||a==='mvl'||a==='rdel')nRowAct(a,b);
   else if(a==='nf')nFolderNew();else if(a==='fm')nFolderMenu(b);else if(a==='mv')nMoveMenu(b)
   else if(a==='back'){nLeave();NS.sel=null;NS.v='l';nList();nEd()}else if(a)nAct(a)});
- el.addEventListener('input',e=>{if(e.target.id==='nq'){NS.q=e.target.value;nList();return}if(e.target.id!=='ned')return;
-  if(e.inputType==='insertParagraph'){const c=nCur(),li=c&&c.closest('li');if(li&&li.hasAttribute('data-c')&&!li.textContent.trim())li.removeAttribute('data-c')}nSave()});
- el.addEventListener('paste',e=>{if(e.target.closest('#ned')){e.preventDefault();document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text/plain'))}});
- el.addEventListener('focusout',e=>{if(e.target.id==='ned')nFlush()})}
-addEventListener('pagehide',()=>{if(nTm)nFlush()});document.addEventListener('visibilitychange',()=>{if(document.hidden&&nTm)nFlush()});
+ el.addEventListener('input',e=>{const t=e.target;if(t.id==='nq'){NS.q=t.value;nList();return}
+  const n=nt(NS.sel);if(!n||n.del||!Array.isArray(n.r))return;
+  if(t.id==='ntl'){nCommit(n);return}
+  if(t.tagName==='TEXTAREA'&&t.dataset.r!==undefined){const rows=n.r;rows[+t.dataset.r][+t.dataset.c]=t.value;nFit(t.closest('.nrow'));if(rows[rows.length-1].some(x=>x.trim()))nAddRow(n);nCommit(n)}});
+ el.addEventListener('keydown',e=>{const t=e.target,ed=E(),n=nt(NS.sel);if(!n||n.del)return;
+  const at=(r,c)=>ed.querySelector(`textarea[data-r="${r}"][data-c="${c}"]`);
+  if(t.id==='ntl'){if(e.key==='Enter'||(e.key==='Tab'&&!e.shiftKey)){const x=at(0,0);if(x){e.preventDefault();x.focus()}}return}
+  if(t.tagName!=='TEXTAREA'||t.dataset.r===undefined)return;const r=+t.dataset.r,c=+t.dataset.c,pl=!e.shiftKey&&!e.altKey&&!e.ctrlKey&&!e.metaKey;
+  const go=(x,end)=>{if(!x)return false;e.preventDefault();x.focus();const p=end?x.value.length:0;x.setSelectionRange(p,p);return true};
+  if(e.key==='Tab'){if(e.shiftKey){if(r>0)go(at(r-1,c),1)}else go(at(r+1,c),0)||e.preventDefault();if(!e.shiftKey||r>0)e.preventDefault();return}
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();nMoveBlock(n,r,c,1);return}
+  if(e.key==='ArrowDown'&&pl&&t.selectionStart===t.value.length&&t.selectionEnd===t.value.length)go(at(r+1,c),0);
+  else if(e.key==='ArrowUp'&&pl&&t.selectionStart===0&&t.selectionEnd===0)go(at(r-1,c),1)});
+ el.addEventListener('focusout',e=>{if(e.target.id==='ntl'||e.target.tagName==='TEXTAREA')nFlush()})}
+addEventListener('pagehide',()=>{if(nTm)nFlush()});addEventListener('resize',()=>{if(PG==='nt'&&E())nFitAll()});document.addEventListener('visibilitychange',()=>{if(document.hidden&&nTm)nFlush()});
 
 /* ================= v3 helpers: overlay scrollbar, popup menu, text prompt, note folders ================= */
 Object.assign(IC,{more:'<path d="M5 12h.01M12 12h.01M19 12h.01"/>',est:'<path d="M3 12c3-5 6-5 9 0s6 5 9 0"/>'});
