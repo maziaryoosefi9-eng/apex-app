@@ -216,11 +216,13 @@ select.hgm{padding:6px 10px}
 .nfs{display:flex;gap:6px;overflow-x:auto;padding:4px 12px 8px}
 .nfc{flex:none;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--bd);border-radius:99px;background:var(--card);white-space:nowrap;font-size:13px}
 .nfc svg{width:14px;height:14px}.nfc.sel{border-color:var(--ac);color:var(--ac);background:color-mix(in srgb,var(--ac) 10%,transparent)}.nft{color:var(--ac)}
+.nh b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#nup{padding:4px 8px 4px 0;gap:2px;flex:none}
+.nfr{display:flex;align-items:center;gap:10px}.nfr .fn{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nfr svg{flex:none;color:var(--ac)}.nfr svg:last-child{color:var(--mut);width:14px;height:14px}
 </style></head><body>
 
 <div id="main"><div id="tlw"><div class="tlh"><div class="pgh"><h2>Timeline</h2><span class="sp"></span><button class="hb2" id="tdb" onclick="goToday()" title="Jump to today"></button><button class="hb2" id="ftb" title="Fit all unfinished tasks" onclick="fitAll()"></button><button class="hb2" id="rfb" title="Tidy up: schedule as early as possible and lay the dependency chains out as flowcharts" onclick="refresh()"></button><select id="tspan" class="pgsel" onchange="spanSel(this.value)" title="Zoom"><option value="">Zoom</option><option value="1">Day</option><option value="7">Week</option><option value="30">Month</option></select></div></div><div id="cv"><svg class="cvs" id="sv"></svg></div></div>
 <div id="pp"></div>
-<div class="page" id="pgH"><div class="pgi"><div class="pgh"><h2>Habits</h2><span class="sp"></span><select id="hgm" class="pgsel" onchange="V.hgm=this.value;save();renderHabits()"><option value="a">All time</option><option value="365">Last 365 days</option><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="1">Last day</option></select></div><div id="hlist"></div></div></div>
+<div class="page" id="pgH"><div class="pgi"><div class="pgh"><h2>Routine</h2><span class="sp"></span><select id="hgm" class="pgsel" onchange="V.hgm=this.value;save();renderHabits()"><option value="a">All time</option><option value="365">Last 365 days</option><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="1">Last day</option></select></div><div id="hlist"></div></div></div>
 <div class="page" id="pgM"><div class="pgi">
 <div class="pgh"><h2>Money</h2><span class="sp"></span><select id="mper" class="pgsel" onchange="mSet('per',this.value)"><option value="all">All time</option><option value="1">Today</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="m">This month</option></select></div>
  <div class="cards" id="msum"></div>
@@ -305,12 +307,12 @@ function render(){
  for(const t of ticks(a,b,u))s+=`<line x1="${X(t)}" x2="${X(t)}" y1="26" y2="${HH}" stroke="var(--bd)"/><text class="m" x="${X(t)+3}" y="42" ${(u===DAY&&new Date(t).getDay()===5)?'style="fill:var(--bad);font-weight:600'+(SH?';font-size:10px':'')+'"':SH?'style="font-size:10px"':''}>${lab(t,u)}</text>`;
  if(drag&&drag.m==='box'&&drag.mv)s+=`<rect x="${Math.min(drag.x0,drag.x)}" y="${Math.min(drag.y0,drag.y)}" width="${Math.abs(drag.x-drag.x0)}" height="${Math.abs(drag.y-drag.y0)}" fill="var(--ac)" fill-opacity=".12" stroke="var(--ac)" pointer-events="none"/>`;
  sv.innerHTML=s;tui();save()}
-const PGN={tl:'Timeline',hb:'Habits',mn:'Money',nt:'Notes',st:'Settings'},PI={tl:'tl',hb:'habit',mn:'wallet',nt:'note',st:'sliders'};
+const PGN={tl:'Timeline',hb:'Routine',mn:'Money',nt:'Notes',st:'Settings'},PI={tl:'tl',hb:'habit',mn:'wallet',nt:'note',st:'sliders'};
 /* how many tasks wait on each task, directly or through a chain */
 function depCounts(){const cv=cvT(),by={},cnt={};cv.forEach(t=>t.deps.forEach(d=>{(by[d]=by[d]||[]).push(t.id)}));
  cv.forEach(t=>{const seen=new Set(),st=[t.id];while(st.length)for(const x of by[st.pop()]||[])if(!seen.has(x)){seen.add(x);st.push(x)}cnt[t.id]=seen.size});return cnt}
 function go(k){hideTip();HFL=null;if(PG==='nt'&&k!=='nt')nLeave();PG=k;V.pg=k;$('main').dataset.pg=k;ppSig='';tb();if(k==='tl')render();else{if(k==='mn')renderMoney();if(k==='hb')renderHabits();if(k==='st')paintSy();if(k==='nt')renderNotes();save()}}
-function tb(){const b=k=>`<button class="${PG===k?'o':''}" title="${PGN[k]}" onclick="go('${k}')">${ic(PI[k])}<span>${PGN[k]}</span></button>`;
+function tb(){const b=k=>`<button class="${PG===k?'o':''}" title="${PGN[k]}" onclick="go('${k}')">${ic(PI[k])}</button>`;
  $('nv').innerHTML=b('tl')+b('hb')+b('mn')+b('nt')+b('st')}
 /* ================= Money ================= */
 Object.assign(IC,{ai:'<path d="M12 19V5M6 11l6-6 6 6"/>',ad:'<path d="M12 5v14M6 13l6 6 6-6"/>',grip:'<path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01"/>',bars:'<path d="M5 20V11M12 20V4M19 20v-6"/>',trend:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',folder:'<path d="M3 7h6l2 2h10v10H3z"/>',plus:'<path d="M12 5v14M5 12h14"/>'});
@@ -853,14 +855,23 @@ function nSave(){const n=nt(NS.sel),e=E();if(!n||n.del||!e.isContentEditable)ret
 function nFlush(){clearTimeout(nTm);nTm=0;save()}
 function nLeave(){const n=nt(NS.sel);if(n&&!n.del&&!nTxt(n.h).length&&!/<li/.test(n.h)){S.notes=S.notes.filter(x=>x!==n);NS.sel=null;save()}}
 function nOpen(id){nLeave();NS.sel=id;NS.v='e';nList();nEd()}
-function nNew(){nLeave();const t=Date.now(),id=nid();S.notes.push({id,h:'<div><br></div>',t:'',p:'',c:t,m:t,pin:false,del:0,f:typeof NS.f==='number'?NS.f:null});NS.f=V.nf=typeof NS.f==='number'?NS.f:'all';NS.q='';$('nq').value='';NS.sel=id;NS.v='e';save();nList();nEd();E().focus()}
+function nNew(){nLeave();if(NS.f==='del')NS.f=V.nf='all';const t=Date.now(),id=nid();S.notes.push({id,h:'<div><br></div>',t:'',p:'',c:t,m:t,pin:false,del:0,f:nCf()});NS.q='';$('nq').value='';NS.sel=id;NS.v='e';save();nList();nEd();E().focus()}
+function nGo(f){nLeave();NS.f=V.nf=f;NS.sel=null;NS.v='l';NS.q='';$('nq').value='';save();renderNotes()}
+function nUp(){const f=nCf()!==null?nt(NS.f):null;nGo(f&&f.f&&nt(f.f)&&nt(f.f).fd?f.f:'all')}
 function nAct(a){const n=nt(NS.sel);if(!n)return;
- if(a==='pin')n.pin=!n.pin;else if(a==='rec'){n.del=0;n.m=Date.now()}
+ if(a==='pin')n.pin=!n.pin;else if(a==='rec'){n.del=0;n.m=Date.now();if(n.f&&!(nt(n.f)&&nt(n.f).fd))n.f=null}
  else if(a==='del'){if(n.del){if(!confirm('Delete this note permanently?'))return;S.notes=S.notes.filter(x=>x!==n)}else{n.del=Date.now();n.pin=false}NS.sel=null;NS.v='l'}
  save();renderNotes()}
-function nList(){const q=NS.q.trim().toLowerCase(),del=NS.f==='del',L=S.notes.filter(n=>!n.fd&&!!n.del===del&&(typeof NS.f!=='number'||n.f===NS.f)&&(!q||nx(n).includes(q)));
+const nIn=(n,cf)=>{const f=n.f&&nt(n.f);return((f&&f.fd)?n.f:null)===cf},nCf=()=>typeof NS.f==='number'?NS.f:null;
+function nCount(id){return S.notes.filter(n=>!n.fd&&!n.del&&n.f===id).length+S.notes.filter(n=>n.fd&&n.f===id).reduce((a,f)=>a+nCount(f.id),0)}
+const fpath=id=>{const a=[];let f=nt(id),g=0;while(f&&f.fd&&g++<30){a.unshift(f.t||'Folder');f=f.f&&nt(f.f)}return a.join(' / ')};
+const fdesc=id=>{const r=new Set([id]);let ch=1;while(ch){ch=0;for(const f of S.notes)if(f.fd&&f.f!=null&&r.has(f.f)&&!r.has(f.id)){r.add(f.id);ch=1}}return r};
+function nList(){const q=NS.q.trim().toLowerCase(),del=NS.f==='del',cf=nCf(),live=S.notes.filter(n=>!n.fd);
+ const L=q?live.filter(n=>!n.del&&nx(n).includes(q)):del?live.filter(n=>n.del):live.filter(n=>!n.del&&nIn(n,cf));
  L.sort((a,b)=>(del?0:(b.pin|0)-(a.pin|0))||b.m-a.m);let h='',last='';
- for(const n of L){const g=!del&&n.pin?'Pinned':nBk(n.m),fq=NS.f==='all'&&n.f&&nt(n.f),fo=fq?`<span class="nft">${esc(fq.t)} · </span>`:'';if(g!==last){h+=`<div class="nsec">${g}</div>`;last=g}
+ if(!q&&!del){for(const f of S.notes.filter(n=>n.fd&&nIn(n,cf)).sort((a,b)=>a.c-b.c))h+=`<div class="ni nfr" data-fid="${f.id}">${ic('folder')}<span class="fn" dir="auto">${esc(f.t||'Folder')}</span><span class="m">${nCount(f.id)}</span>${ic('chr')}</div>`;
+  if(cf===null)h+=`<div class="ni nfr" data-fid="del">${ic('trash')}<span class="fn">Recently Deleted</span><span class="m">${live.filter(n=>n.del).length}</span>${ic('chr')}</div>`}
+ for(const n of L){const g=!del&&n.pin?'Pinned':nBk(n.m),fq=(q||del)&&n.f&&nt(n.f)&&nt(n.f).fd?fpath(n.f):'',fo=fq?`<span class="nft">${esc(fq)} · </span>`:'';if(g!==last){h+=`<div class="nsec">${g}</div>`;last=g}
   h+=`<div class="ni${n.id===NS.sel?' sel':''}" data-id="${n.id}"><div class="nt" dir="auto">${esc(n.t||'New Note')}</div><div class="np" dir="auto"><b>${nDt(n.m)}</b> ${fo}${esc(n.p||'No additional text')}</div></div>`}
  $('nrows').innerHTML=h||`<div class="m" style="padding:28px;text-align:center">${q?'No Results':del?'Nothing deleted':'No Notes'}</div>`;
  nChips()}
@@ -869,19 +880,20 @@ function nEd(){const n=nt(NS.sel),e=E();$('nee').classList.toggle('empty',!n);$(
  e.contentEditable=!n.del;$('nrec').style.display=n.del?'':'none';$('npin').style.display=n.del?'none':'';$('nmv').style.display=n.del?'none':'';$('npin').classList.toggle('pn',!!n.pin);$('ndate').textContent=nDl(n)}
 function renderNotes(){const el=$('pgN');if(!el.firstChild)nInit(el);if(typeof NS.f==='number'){const f=nt(NS.f);if(!f||!f.fd)NS.f=V.nf='all'}const now=Date.now(),c0=S.notes.length;S.notes=S.notes.filter(n=>!(n.del&&now-n.del>30*DAY));
  if(NS.sel&&!nt(NS.sel))NS.sel=null;
- if(!NS.sel&&innerWidth>820){const l=S.notes.filter(n=>!n.fd&&!!n.del===(NS.f==='del')&&(typeof NS.f!=='number'||n.f===NS.f)).sort((a,b)=>(b.pin|0)-(a.pin|0)||b.m-a.m)[0];if(l)NS.sel=l.id}
+ if(!NS.sel&&innerWidth>820){const del=NS.f==='del',cf=nCf(),l=S.notes.filter(n=>!n.fd&&!!n.del===del&&(del||nIn(n,cf))).sort((a,b)=>(b.pin|0)-(a.pin|0)||b.m-a.m)[0];if(l)NS.sel=l.id}
  if(S.notes.length!==c0)save();nList();nEd()}
-function nInit(el){el.innerHTML=`<div class="nw" id="nw" data-v="l"><div class="nl"><div class="nh"><b>Notes</b><span class="sp"></span><button data-a="new" title="New note">${ic('nw')}</button></div><div class="nfs" id="nfs"></div><input class="nq" id="nq" type="search" dir="auto" placeholder="Search"><div class="nr" id="nrows"></div></div>
+function nInit(el){el.innerHTML=`<div class="nw" id="nw" data-v="l"><div class="nl"><div class="nh"><button data-a="up" id="nup" style="display:none">${ic('chl')}<span>Notes</span></button><b id="nht" dir="auto">Notes</b><span class="sp"></span><button data-a="nf" id="nnf" title="New folder">${ic('folder')}</button><button data-a="fm" id="nfmb" title="Folder options" style="display:none">${ic('more')}</button><button data-a="new" id="nnn" title="New note">${ic('nw')}</button></div><input class="nq" id="nq" type="search" dir="auto" placeholder="Search"><div class="nr" id="nrows"></div></div>
 <div class="ne" id="nee"><div class="nb"><button class="nbk" data-a="back">${ic('chl')}<span>Notes</span></button><span class="sp"></span><button data-a="rec" id="nrec" title="Recover">${ic('rec')}</button><button data-a="mv" id="nmv" title="Move to folder">${ic('folder')}</button><button data-a="pin" id="npin" title="Pin">${ic('pin')}</button><button data-a="del" title="Delete">${ic('trash')}</button></div>
 <div class="nf"><button data-c="bold"><b>B</b></button><button data-c="italic"><i>I</i></button><button data-c="underline"><u>U</u></button><button data-c="strikeThrough"><s>S</s></button><button data-c="h">H</button><button data-l="ul">${ic('ul')}</button><button data-l="ds">${ic('ds')}</button><button data-l="ol">${ic('ol')}</button><button data-l="cl">${ic('chk')}</button></div>
 <div class="ns"><div class="nd" id="ndate"></div><div class="ned" id="ned" contenteditable="true" spellcheck="true"></div></div><div class="nem">No Note Selected</div></div></div>`;
  el.addEventListener('mousedown',e=>{if(e.target.closest('.nf'))e.preventDefault()});
  el.addEventListener('click',e=>{const li=e.target.closest('#ned li');
   if(li&&li.parentNode.classList.contains('cl')&&E().isContentEditable){const r=li.getBoundingClientRect(),x=li.parentNode.dir==='rtl'?r.right-e.clientX:e.clientX-r.left;if(x<30){e.preventDefault();li.toggleAttribute('data-c');nSave();return}}
+  const fr=e.target.closest('.nfr');if(fr){const v=fr.dataset.fid;nGo(v==='del'?'del':+v);return}
   const r=e.target.closest('.ni');if(r){nOpen(+r.dataset.id);return}
   const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;
   if(b.dataset.c)nCmd(b.dataset.c);else if(b.dataset.l)nLs(b.dataset.l);else if(a==='new')nNew();
-  else if(a==='f'){nLeave();const fv=b.dataset.f;NS.f=V.nf=(fv==='all'||fv==='del')?fv:+fv;NS.sel=null;NS.v='l';save();renderNotes()}
+  else if(a==='up')nUp();
   else if(a==='nf')nFolderNew();else if(a==='fm')nFolderMenu(b);else if(a==='mv')nMoveMenu(b)
   else if(a==='back'){nLeave();NS.sel=null;NS.v='l';nList();nEd()}else if(a)nAct(a)});
  el.addEventListener('input',e=>{if(e.target.id==='nq'){NS.q=e.target.value;nList();return}if(e.target.id!=='ned')return;
@@ -913,19 +925,20 @@ function askText(title,val,cb){const o=document.createElement('div');o.style.css
 function mMenu(b,id){const n=itm(id);if(!n)return;const p=isP(id);
  popMenu(b,[!p&&{ic:'est',t:n.est?'Mark as exact amount':'Mark as estimate',fn:()=>mEst(id)},{ic:n.hid?'eyeoff':'eye',t:n.hid?'Count in totals':'Ignore in totals',fn:()=>mHide(id)},{ic:'plus',t:'Add item below',fn:()=>{MF.sel=[id];mAdd()}},{ic:'trash',t:'Delete',bad:1,sure:1,fn:()=>{MF.del=id;mDel(id)}}].filter(Boolean))}
 function mEst(id){const n=itm(id);if(!n)return;hist();n.est=!n.est;save();renderMoney()}
-function nMkFolder(name){const t=Date.now(),id=nid();S.notes.push({id,fd:1,t:name,c:t,m:t,del:0});return id}
-function nChips(){const el=$('nfs');if(!el)return;const sl=el.scrollLeft,F=S.notes.filter(n=>n.fd).sort((a,b)=>a.c-b.c);
- let h=`<button class="nfc${NS.f==='all'?' sel':''}" data-a="f" data-f="all">All Notes</button>`;
- for(const f of F)h+=`<button class="nfc${NS.f===f.id?' sel':''}" data-a="f" data-f="${f.id}">${ic('folder')}<span dir="auto">${esc(f.t||'Folder')}</span></button>`;
- h+=`<button class="nfc" data-a="nf" title="New folder">${ic('plus')}</button><button class="nfc${NS.f==='del'?' sel':''}" data-a="f" data-f="del">Recently Deleted</button>`;
- if(typeof NS.f==='number')h+=`<button class="nfc" data-a="fm" title="Folder options">${ic('more')}</button>`;
- el.innerHTML=h;el.scrollLeft=sl}
-function nFolderNew(){askText('New folder','',v=>{v=v.trim();if(!v)return;const id=nMkFolder(v);NS.f=V.nf=id;NS.sel=null;NS.v='l';save();renderNotes()})}
-function nFolderMenu(b){const f=nt(NS.f);if(!f||!f.fd)return;
- popMenu(b,[{ic:'edit',t:'Rename folder',fn:()=>askText('Rename folder',f.t,v=>{v=v.trim();if(v){f.t=v;save();renderNotes()}})},{ic:'trash',t:'Delete folder (keep notes)',bad:1,sure:1,fn:()=>{S.notes.forEach(x=>{if(x.f===f.id)x.f=null});S.notes=S.notes.filter(x=>x!==f);NS.f=V.nf='all';NS.sel=null;NS.v='l';save();renderNotes()}}])}
-function nMoveMenu(b){const n=nt(NS.sel);if(!n||n.del)return;const F=S.notes.filter(x=>x.fd).sort((a,c)=>a.c-c.c);
- const mv=f=>{n.f=f;save();if(typeof NS.f==='number'&&n.f!==NS.f){NS.sel=null;NS.v='l'}renderNotes()};
- popMenu(b,[{ic:!n.f?'done':'folder',t:'No folder',fn:()=>mv(null)},...F.map(f=>({ic:n.f===f.id?'done':'folder',t:f.t||'Folder',fn:()=>mv(f.id)})),{ic:'plus',t:'New folder…',fn:()=>askText('New folder','',v=>{v=v.trim();if(v)mv(nMkFolder(v))})}])}
+function nMkFolder(name,par){const t=Date.now(),id=nid();S.notes.push({id,fd:1,t:name,c:t,m:t,del:0,f:par==null?null:par});return id}
+function nChips(){const b=$('nht');if(!b)return;const cur=NS.f,f=nCf()!==null?nt(cur):null,p=f&&f.f&&nt(f.f)&&nt(f.f).fd?nt(f.f):null;
+ b.textContent=cur==='del'?'Recently Deleted':f?(f.t||'Folder'):'Notes';
+ $('nup').style.display=cur==='all'?'none':'';$('nup').querySelector('span').textContent=p?(p.t||'Folder'):'Notes';
+ $('nfmb').style.display=f?'':'none';$('nnf').style.display=cur==='del'?'none':'';$('nnn').style.display=cur==='del'?'none':''}
+function nFolderNew(){askText('New folder','',v=>{v=v.trim();if(!v)return;nMkFolder(v,nCf());save();renderNotes()})}
+function nFolderMenu(b){const f=nCf()!==null?nt(NS.f):null;if(!f||!f.fd)return;
+ popMenu(b,[{ic:'edit',t:'Rename folder',fn:()=>askText('Rename folder',f.t,v=>{v=v.trim();if(v){f.t=v;save();renderNotes()}})},{ic:'folder',t:'Move folder…',fn:()=>nMoveFolder(f)},{ic:'trash',t:'Delete folder (keep contents)',bad:1,sure:1,fn:()=>{const par=f.f&&nt(f.f)&&nt(f.f).fd?f.f:null;S.notes.forEach(x=>{if(x.f===f.id)x.f=par});S.notes=S.notes.filter(x=>x!==f);NS.f=V.nf=par===null?'all':par;NS.sel=null;NS.v='l';save();renderNotes()}}])}
+function nMoveFolder(f){const bad=fdesc(f.id),F=S.notes.filter(x=>x.fd&&!bad.has(x.id)).sort((a,c)=>fpath(a.id).localeCompare(fpath(c.id)));
+ const mv=p=>{f.f=p;save();NS.f=V.nf=f.id;renderNotes()};
+ setTimeout(()=>popMenu($('nfmb'),[{ic:!f.f?'done':'folder',t:'Top level',fn:()=>mv(null)},...F.map(x=>({ic:f.f===x.id?'done':'folder',t:fpath(x.id),fn:()=>mv(x.id)}))]),0)}
+function nMoveMenu(b){const n=nt(NS.sel);if(!n||n.del)return;const F=S.notes.filter(x=>x.fd).sort((a,c)=>fpath(a.id).localeCompare(fpath(c.id)));
+ const mv=f=>{n.f=f;save();if(!NS.q&&!nIn(n,nCf())){NS.sel=null;NS.v='l'}renderNotes()};
+ popMenu(b,[{ic:!n.f?'done':'folder',t:'No folder',fn:()=>mv(null)},...F.map(f=>({ic:n.f===f.id?'done':'folder',t:fpath(f.id),fn:()=>mv(f.id)})),{ic:'plus',t:'New folder…',fn:()=>askText('New folder','',v=>{v=v.trim();if(v)mv(nMkFolder(v,null))})}])}
 (function(){const p=$('pp');let y0=null,dy=0;
  p.addEventListener('pointerdown',e=>{if(innerWidth>820||!e.target.closest('.grab,.ph')||e.target.closest('button'))return;y0=e.clientY;dy=0;p.style.transition='none';try{p.setPointerCapture(e.pointerId)}catch(_){}});
  p.addEventListener('pointermove',e=>{if(y0==null)return;dy=Math.max(0,e.clientY-y0);p.style.transform='translateY('+dy+'px)'});
