@@ -875,7 +875,7 @@ const nMr=t=>t.split('\n').map(l=>pfx(l)?'<span class="'+fcls(l).trim()+'">'+esc
 const nCv=t=>{const L=t.split('\n').filter(l=>mkS(l).trim()),M=L.filter(l=>pfx(l).includes(FB));return(M.length?M:L).map(l=>'<div class="'+fcls(l).trim()+'">'+esc(mkS(l).trim())+'</div>').join('')};
 const nPaint=(row,v)=>{row.querySelector('.nmr').innerHTML=nMr(v);row.querySelector('.ncv').innerHTML=nCv(v)};
 function nCommit(n){const tl=($('ntl').value||'').trim(),flat=n.r.flatMap(r=>mkS(r[0]||'').split('\n')).map(x=>x.trim()).filter(Boolean);
- n.t=tl;n.h=[tl,...flat].filter(Boolean).map(l=>'<div>'+esc(l)+'</div>').join('');n.p=flat.join(' ').slice(0,120);n.m=Date.now();$('ndate').textContent=nDl(n);clearTimeout(nTm);nTm=setTimeout(nFlush,500);nList()}
+ n.t=tl;n.h=[tl,...flat].filter(Boolean).map(l=>'<div>'+esc(l)+'</div>').join('');n.p=flat.join(' ').slice(0,120);n.m=Date.now();$('ndate').textContent=nDl(n);clearTimeout(nTm);nTm=setTimeout(nFlush,500);nList();npSync()}
 function nSave(){const n=nt(NS.sel);if(n&&!n.del&&Array.isArray(n.r))nCommit(n)}
 function nFlush(){clearTimeout(nTm);nTm=0;save()}
 function nLeave(){const n=nt(NS.sel);if(n&&!n.del&&!nTxt(n.h).length&&!/<li/.test(n.h)){S.notes=S.notes.filter(x=>x!==n);NS.sel=null;save()}}
@@ -884,7 +884,7 @@ function nNew(){nLeave();if(NS.f==='del')NS.f=V.nf='all';const t=Date.now(),id=n
 function nGo(f){nLeave();NS.f=V.nf=f;NS.sel=null;NS.v='l';NS.q='';$('nq').value='';save();renderNotes()}
 function nUp(){const f=nCf()!==null?nt(NS.f):null;nGo(f&&f.f&&nt(f.f)&&nt(f.f).fd?f.f:'all')}
 function nAct(a){const n=nt(NS.sel);if(!n)return;
- if(a==='pin')n.pin=!n.pin;else if(a==='rec'){n.del=0;n.m=Date.now();if(n.f&&!(nt(n.f)&&nt(n.f).fd))n.f=null}
+ if(a==='pin'){if(n.pin){n.pin=false;save()}nPop();return}else if(a==='rec'){n.del=0;n.m=Date.now();if(n.f&&!(nt(n.f)&&nt(n.f).fd))n.f=null}
  else if(a==='del'){if(n.del){if(!confirm('Delete this note permanently?'))return;S.notes=S.notes.filter(x=>x!==n)}else{n.del=Date.now();n.pin=false}NS.sel=null;NS.v='l'}
  save();renderNotes()}
 const nIn=(n,cf)=>{const f=n.f&&nt(n.f);return((f&&f.fd)?n.f:null)===cf},nCf=()=>typeof NS.f==='number'?NS.f:null;
@@ -952,13 +952,13 @@ function nDragEnd(){if(!ND)return;const{n,row,i,t}=ND;ND=null;const ed=E(),other
  if(t!==i){const [it]=n.r.splice(i,1);n.r.splice(t,0,it);if(t>=others.length)ed.appendChild(row);else ed.insertBefore(row,others[t]);nReidx();nCommit(n)}}
 function nEd(){const n=nt(NS.sel),e=E();$('nee').classList.toggle('empty',!n);$('nw').dataset.v=NS.v;if(!n){e.innerHTML='';$('ntl').value='';NS.ld=0;return}
  const ae=document.activeElement,busy=ae&&(e.contains(ae)||ae===$('ntl'));if(NS.ld!==n.id||!busy)nBuild(n);
- $('nrec').style.display=n.del?'':'none';$('npin').style.display=n.del?'none':'';$('nmv').style.display=n.del?'none':'';$('npin').classList.toggle('pn',!!n.pin);$('ndate').textContent=nDl(n)}
+ $('nrec').style.display=n.del?'':'none';$('npin').style.display=n.del?'none':'';$('nmv').style.display=n.del?'none':'';$('npin').classList.toggle('pn',!!(NP&&NP.id===n.id));$('ndate').textContent=nDl(n);npSync()}
 function renderNotes(){const el=$('pgN');if(!el.firstChild)nInit(el);if(typeof NS.f==='number'){const f=nt(NS.f);if(!f||!f.fd)NS.f=V.nf='all'}const now=Date.now(),c0=S.notes.length;S.notes=S.notes.filter(n=>!(n.del&&now-n.del>30*DAY));
  if(NS.sel&&!nt(NS.sel))NS.sel=null;
  if(!NS.sel&&innerWidth>820){const del=NS.f==='del',cf=nCf(),l=S.notes.filter(n=>!n.fd&&!!n.del===del&&(del||nIn(n,cf))).sort((a,b)=>(b.pin|0)-(a.pin|0)||b.m-a.m)[0];if(l)NS.sel=l.id}
  if(S.notes.length!==c0)save();nList();nEd()}
 function nInit(el){el.innerHTML=`<div class="nw" id="nw" data-v="l"><div class="nl"><div class="nh"><button data-a="up" id="nup" style="display:none">${ic('chl')}<span>Notes</span></button><b id="nht" dir="auto">Notes</b><span class="sp"></span><button data-a="nf" id="nnf" title="New folder">${ic('folder')}</button><button data-a="fm" id="nfmb" title="Folder options" style="display:none">${ic('more')}</button><button data-a="new" id="nnn" title="New note">${ic('nw')}</button></div><input class="nq" id="nq" type="search" dir="auto" placeholder="Search"><div class="nr" id="nrows"></div></div>
-<div class="ne" id="nee"><div class="nb"><button class="nbk" data-a="back">${ic('chl')}<span>Notes</span></button><span class="sp"></span><button class="nfx" data-a="mk" id="nmk" title="Bold + final: mark the selected lines (tap again to unmark)">${ic('star')}</button><button class="nfx" data-a="mu" id="nmu" title="Underline the selected lines">${ic('ul2')}</button><button class="nfx" data-a="ms" id="nms" title="Strike through the selected lines">${ic('st2')}</button><button data-a="fold" id="nfd" title="Fold all blocks to the final lines / unfold all">${ic('fold')}</button><button data-a="rec" id="nrec" title="Recover">${ic('rec')}</button><button data-a="mv" id="nmv" title="Move to folder">${ic('folder')}</button><button data-a="pin" id="npin" title="Pin">${ic('pin')}</button><button data-a="del" title="Delete">${ic('trash')}</button></div>
+<div class="ne" id="nee"><div class="nb"><button class="nbk" data-a="back">${ic('chl')}<span>Notes</span></button><span class="sp"></span><button class="nfx" data-a="mk" id="nmk" title="Bold + final: mark the selected lines (tap again to unmark)">${ic('star')}</button><button class="nfx" data-a="mu" id="nmu" title="Underline the selected lines">${ic('ul2')}</button><button class="nfx" data-a="ms" id="nms" title="Strike through the selected lines">${ic('st2')}</button><button data-a="fold" id="nfd" title="Fold all blocks to the final lines / unfold all">${ic('fold')}</button><button data-a="rec" id="nrec" title="Recover">${ic('rec')}</button><button data-a="mv" id="nmv" title="Move to folder">${ic('folder')}</button><button data-a="pin" id="npin" title="Pop out this note (floating window, always on top)">${ic('pin')}</button><button data-a="del" title="Delete">${ic('trash')}</button></div>
 <div class="ns"><div class="nd" id="ndate"></div><input class="ntl" id="ntl" dir="auto" placeholder="Title" autocomplete="off"><div class="nblocks" id="ned"></div></div><div class="nem">No Note Selected</div></div></div>`;
  el.addEventListener('mousedown',e=>{if(e.target.closest('.nf,.nfx'))e.preventDefault()});
  el.addEventListener('click',e=>{const li=e.target.closest('#ned li');
@@ -1000,6 +1000,46 @@ function nInit(el){el.innerHTML=`<div class="nw" id="nw" data-v="l"><div class="
  el.addEventListener('pointermove',nDragMove);el.addEventListener('pointerup',nDragEnd);el.addEventListener('pointercancel',nDragEnd);
  el.addEventListener('focusout',e=>{if(e.target.id==='ntl'||e.target.tagName==='TEXTAREA'){if(e.target.tagName==='TEXTAREA'&&E().contains(e.target))nRec(e.target);nFlush();const n0=nt(NS.sel);setTimeout(()=>{if(n0&&NS.sel===n0.id){nPrune(n0);nTail(n0)}},0)}})}
 addEventListener('pagehide',()=>{if(nTm)nFlush()});addEventListener('resize',()=>{if(PG==='nt'&&E())nFitAll()});document.addEventListener('visibilitychange',()=>{if(document.hidden&&nTm)nFlush()});
+
+/* ================= Notes pop-out: floating always-on-top window (Document Picture-in-Picture) ================= */
+var NP=null;
+function npClose(){const w=NP&&NP.w;NP=null;try{if(w&&!w.closed)w.close()}catch(_){}const b=$('npin');if(b)b.classList.remove('pn')}
+function npBuild(n){if(!NP)return;const d=NP.w.document,rows=nNorm(n);if(!n.del&&(!rows.length||!nEm(rows[rows.length-1])))rows.push(['','',0]);
+ const sc=d.getElementById('pns'),top=sc.scrollTop;d.getElementById('ptl').value=n.t||'';
+ const ed=d.getElementById('ped');ed.innerHTML=rows.map(nRowH).join('');ed.querySelectorAll('.nrow').forEach(nFit);sc.scrollTop=top;d.title=n.t||'Note'}
+function npSync(){if(!NP)return;const n=nt(NP.id);if(!n||n.del||NP.w.closed){npClose();return}
+ const ae=NP.w.document.activeElement;if(ae&&(ae.tagName==='TEXTAREA'||ae.tagName==='INPUT'))return;npBuild(n)}
+function npMain(n){clearTimeout(NP&&NP.tm);if(!NP)return;NP.tm=setTimeout(()=>{if(!NP||NS.sel!==n.id)return;const ae=document.activeElement;if(ae&&(E().contains(ae)||ae===$('ntl')))return;nBuild(n)},350)}
+async function nPop(){const n=nt(NS.sel);if(!n||n.del)return;
+ if(!('documentPictureInPicture' in window)){alert('The floating window needs Chrome or Edge 116+ on desktop (Windows / Mac / Linux).');return}
+ if(NP&&NP.id===n.id&&!NP.w.closed){NP.w.focus();return}
+ if(NP)npClose();else{try{const o=documentPictureInPicture.window;if(o)o.close()}catch(_){}}
+ nSave();nFlush();
+ let w;try{w=await documentPictureInPicture.requestWindow({width:380,height:480})}catch(err){alert('Could not open the floating window: '+(err&&err.message||err));return}
+ const d=w.document;NP={w,id:n.id,tm:0};
+ document.querySelectorAll('style,link[rel=stylesheet]').forEach(x=>d.head.appendChild(x.cloneNode(true)));
+ const st=d.createElement('style');st.textContent='html,body{height:100%;margin:0}body{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--tx)}#pns{flex:1;min-height:0;overflow:auto;padding:10px 12px 24px}.ngr{display:none!important}.nrow{grid-template-columns:22px minmax(0,1fr)!important;gap:4px!important}.ntl{font-size:20px!important}';
+ d.head.appendChild(st);
+ d.body.innerHTML='<div id="pns"><input class="ntl" id="ptl" dir="auto" placeholder="Title" autocomplete="off"><div class="nblocks" id="ped"></div></div>';
+ npBuild(n);const b=$('npin');if(b)b.classList.add('pn');
+ const cur=()=>{const x=NP&&nt(NP.id);return x&&!x.del&&Array.isArray(x.r)?x:null};
+ const fix=t=>{let v=t.value;if(/[^\n\u2062-\u2064][\u2062-\u2064]/.test(v)){const pc=t.selectionStart,L=v.split('\n');let q=0,nq=0,np=pc;
+   L.forEach((l,k)=>{let x=l;const bad=/[^\u2062-\u2064][\u2062-\u2064]/.test(l),fl=FO.filter(f=>l.includes(f)).join('');if(bad)x=fl+mkS(l);const o=pc-q;
+    if(o>=0&&o<=l.length){if(!bad)np=nq+o;else{const c1=(l.slice(0,o).match(/[\u2062-\u2064]/g)||[]).length;np=nq+(o-c1)+fl.length}}
+    L[k]=x;q+=l.length+1;nq+=x.length+1});v=L.join('\n');t.value=v;t.setSelectionRange(np,np)}return v};
+ d.addEventListener('focusin',()=>{const a=document.activeElement;if(a&&a!==document.body&&a.blur)a.blur()});
+ d.addEventListener('input',e=>{const t=e.target,n=cur();if(!n)return;
+  if(t.id==='ptl'){$('ntl').value=t.value;nCommit(n);npMain(n);return}
+  if(t.tagName==='TEXTAREA'&&t.dataset.r!==undefined){const i=+t.dataset.r,v=fix(t);if(!n.r[i])return;n.r[i][0]=v;const row=t.closest('.nrow');nPaint(row,v);nFit(row);
+   if(i===n.r.length-1&&!nEm(n.r[i])){n.r.push(['','',0]);const ed=d.getElementById('ped');ed.insertAdjacentHTML('beforeend',nRowH(['',''],n.r.length-1));nFit(ed.lastElementChild)}
+   nCommit(n);npMain(n)}});
+ d.addEventListener('click',e=>{const n=cur();if(!n)return;const ed=d.getElementById('ped'),tg=e.target.closest('.ntg'),cv=e.target.closest('.ncv');
+  if(tg||cv){const row=(tg||cv).closest('.nrow'),i=[...ed.children].indexOf(row);if(!n.r[i])return;
+   if(tg){const c=!row.classList.contains('cld');if(c&&nEm(n.r[i]))return;n.r[i][2]=c?1:0;row.classList.toggle('cld',c);if(!c)nFit(row);nLater();npMain(n)}
+   else{n.r[i][2]=0;row.classList.remove('cld');nFit(row);const x=row.querySelector('textarea');x.focus();x.setSelectionRange(x.value.length,x.value.length);nLater()}}});
+ d.addEventListener('keydown',e=>{const t=e.target;if(t.id==='ptl'&&(e.key==='Enter'||e.key==='Tab')){const x=d.querySelector('#ped textarea');if(x){e.preventDefault();x.focus()}}});
+ w.addEventListener('pagehide',()=>{if(!NP||NP.w!==w)return;const id=NP.id;clearTimeout(NP.tm);NP=null;nFlush();const b=$('npin');if(b)b.classList.remove('pn');
+  const m=nt(id);if(m&&!m.del&&NS.sel===id)nBuild(m)})}
 
 /* ================= v3 helpers: overlay scrollbar, popup menu, text prompt, note folders ================= */
 Object.assign(IC,{more:'<path d="M5 12h.01M12 12h.01M19 12h.01"/>',est:'<path d="M3 12c3-5 6-5 9 0s6 5 9 0"/>'});
