@@ -218,9 +218,15 @@ select.hgm{padding:6px 10px}
 .nfc svg{width:14px;height:14px}.nfc.sel{border-color:var(--ac);color:var(--ac);background:color-mix(in srgb,var(--ac) 10%,transparent)}.nft{color:var(--ac)}
 .nh b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#nup{padding:4px 8px 4px 0;gap:2px;flex:none}
 .nfr{display:flex;align-items:center;gap:10px}.nfr .fn{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nfr svg{flex:none;color:var(--ac)}.nfr svg:last-child{color:var(--mut);width:14px;height:14px}
+.nfr .nch{display:flex;flex:none}.nfr .nch svg{width:14px;height:14px;color:var(--mut);transition:transform .15s}.nfr.open .nch svg{transform:rotate(90deg)}
+.nfr.tf{background:color-mix(in srgb,var(--ac) 9%,transparent)}.nfr{user-select:none}
+.nfo{flex:none;display:flex;padding:2px 4px!important;border:0;background:transparent;opacity:0;transition:opacity .12s}.nfr:hover .nfo,.nfo:focus{opacity:1}@media(hover:none){.nfo{opacity:.7}}
+.nemp{font-size:12.5px;padding:2px 10px 6px}
 .ntl{width:100%;box-sizing:border-box;border:0;background:transparent;font-size:24px;font-weight:700;padding:2px 0 12px;border-radius:0}.ntl:focus{border:0;background:transparent}
 .nblocks{display:flex;flex-direction:column;gap:8px}
-.nrow{position:relative;display:grid;grid-template-columns:18px 22px minmax(0,1fr);gap:6px;align-items:stretch}
+.nrow{position:relative;display:grid;grid-template-columns:18px 22px minmax(0,1fr) 22px;gap:6px;align-items:stretch}
+.nxd{align-self:flex-start;display:flex;justify-content:center;padding:10px 0 0!important;color:var(--mut);border:0;background:transparent;opacity:0;transition:opacity .12s}.nxd svg{width:14px;height:14px}
+.nrow:hover .nxd,.nrow:focus-within .nxd{opacity:.8}.nxd:hover{color:var(--bad);opacity:1}.nxd.sure{opacity:1;color:var(--bad)}@media(hover:none){.nxd{opacity:.55}}
 .ntg{align-self:stretch;align-items:flex-start;justify-content:center;padding:10px 0 0!important;color:var(--mut);border:0}.ntg svg{width:14px;height:14px;transition:transform .15s}.nrow:not(.cld) .ntg svg{transform:rotate(90deg)}
 .nbx{position:relative;min-width:0;background:var(--bg);border-radius:10px}
 .nmr{position:absolute;inset:0;box-sizing:border-box;overflow:hidden;pointer-events:none;color:var(--tx);white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;line-height:1.55;font-size:16px;padding:8px 10px;border:1px solid transparent;border-radius:10px;letter-spacing:normal}
@@ -234,7 +240,7 @@ select.hgm{padding:6px 10px}
 .nrow.dpb::before,.nrow.dpa::after{content:'';position:absolute;left:0;right:0;height:3px;border-radius:2px;background:var(--ac);pointer-events:none}.nrow.dpb::before{top:-6px}.nrow.dpa::after{bottom:-6px}
 .nrow textarea{position:relative;z-index:1;display:block;width:100%;box-sizing:border-box;resize:none;overflow:hidden;min-height:76px;line-height:1.55;font-size:16px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:transparent;letter-spacing:normal;color:transparent;caret-color:var(--tx)}
 .nrow textarea:focus{border-color:var(--ac)}
-@media(max-width:820px){.ns{padding:10px 12px 40px}.nrow{gap:4px;grid-template-columns:16px 20px minmax(0,1fr)}.nrow textarea,.nmr,.ncv{padding:8px}}
+@media(max-width:820px){.ns{padding:10px 12px 40px}.nrow{gap:4px;grid-template-columns:16px 20px minmax(0,1fr) 20px}.nrow textarea,.nmr,.ncv{padding:8px}}
 </style></head><body>
 
 <div id="main"><div id="tlw"><div class="tlh"><div class="pgh"><h2>Timeline</h2><span class="sp"></span><button class="hb2" id="tdb" onclick="goToday()" title="Jump to today"></button><button class="hb2" id="ftb" title="Fit all unfinished tasks horizontally" onclick="fitAll()"></button><button class="hb2" id="ftv" title="Fit all unfinished tasks vertically" onclick="fitV()"></button><button class="hb2" id="rfb" title="Tidy up: schedule as early as possible and lay the dependency chains out as flowcharts" onclick="refresh()"></button><select id="tspan" class="pgsel" onchange="spanSel(this.value)" title="Zoom"><option value="">Zoom</option><option value="1">Day</option><option value="7">Week</option><option value="30">Month</option></select></div></div><div id="cv"><svg class="cvs" id="sv"></svg></div></div>
@@ -872,15 +878,15 @@ const nDl=n=>{const d=new Date(n.m);return d.getDate()+' '+NM[d.getMonth()]+' '+
 const FB='\u2063',FU='\u2064',FS='\u2062',FO=[FB,FU,FS],mkS=s=>s.replace(/[\u2062-\u2064]/g,''),pfx=l=>l.match(/^[\u2062-\u2064]*/)[0],nEm=r=>!mkS(r[0]||'').trim();
 const fcls=l=>{const p=pfx(l);return(p.includes(FB)?' xb':'')+(p.includes(FU)?' xu':'')+(p.includes(FS)?' xs':'')};
 const nMr=t=>t.split('\n').map(l=>pfx(l)?'<span class="'+fcls(l).trim()+'">'+esc(l)+'</span>':esc(l)).join('\n')+'\n';
-const nCv=t=>{const L=t.split('\n').filter(l=>mkS(l).trim()),M=L.filter(l=>pfx(l).includes(FB));return(M.length?M:L).map(l=>'<div class="'+fcls(l).trim()+'">'+esc(mkS(l).trim())+'</div>').join('')};
-const nPaint=(row,v)=>{row.querySelector('.nmr').innerHTML=nMr(v);row.querySelector('.ncv').innerHTML=nCv(v)};
+const nCv=(t,st,ct)=>{const L=t.split('\n').filter(l=>mkS(l).trim()),M=L.filter(l=>pfx(l).includes(FB)),s0=st||0,c0=ct||4;return(M.length?M:L.slice(s0,s0+c0)).map(l=>'<div class="'+fcls(l).trim()+'">'+esc(mkS(l).trim())+'</div>').join('')};
+const nPaint=(row,v)=>{row.querySelector('.nmr').innerHTML=nMr(v);row.querySelector('.ncv').innerHTML=nCv(v,+row.dataset.ps||0,+row.dataset.pc||0)};
 function nCommit(n){const tl=($('ntl').value||'').trim(),flat=n.r.flatMap(r=>mkS(r[0]||'').split('\n')).map(x=>x.trim()).filter(Boolean);
  n.t=tl;n.h=[tl,...flat].filter(Boolean).map(l=>'<div>'+esc(l)+'</div>').join('');n.p=flat.join(' ').slice(0,120);n.m=Date.now();$('ndate').textContent=nDl(n);clearTimeout(nTm);nTm=setTimeout(nFlush,500);nList();npSync()}
 function nSave(){const n=nt(NS.sel);if(n&&!n.del&&Array.isArray(n.r))nCommit(n)}
 function nFlush(){clearTimeout(nTm);nTm=0;save()}
 function nLeave(){const n=nt(NS.sel);if(n&&!n.del&&!nTxt(n.h).length&&!/<li/.test(n.h)){S.notes=S.notes.filter(x=>x!==n);NS.sel=null;save()}}
-function nOpen(id){nLeave();NS.sel=id;NS.v='e';nList();nEd()}
-function nNew(){nLeave();if(NS.f==='del')NS.f=V.nf='all';const t=Date.now(),id=nid();S.notes.push({id,h:'',r:[['','']],t:'',p:'',c:t,m:t,pin:false,del:0,f:nCf()});NS.q='';$('nq').value='';NS.sel=id;NS.v='e';save();nList();nEd();$('ntl').focus()}
+function nOpen(id){nLeave();const n0=nt(id);if(n0)NS.tf=n0.f&&nt(n0.f)&&nt(n0.f).fd?n0.f:null;NS.sel=id;NS.v='e';nList();nEd()}
+function nNew(){nLeave();if(NS.f==='del')NS.f=V.nf='all';const t=Date.now(),id=nid(),tf=NS.tf!=null&&nt(NS.tf)&&nt(NS.tf).fd?NS.tf:null;if(tf!=null)nExpTo(tf);S.notes.push({id,h:'',r:[['','']],t:'',p:'',c:t,m:t,pin:false,del:0,f:tf});NS.q='';$('nq').value='';NS.sel=id;NS.v='e';save();nList();nEd();$('ntl').focus()}
 function nGo(f){nLeave();NS.f=V.nf=f;NS.sel=null;NS.v='l';NS.q='';$('nq').value='';save();renderNotes()}
 function nUp(){const f=nCf()!==null?nt(NS.f):null;nGo(f&&f.f&&nt(f.f)&&nt(f.f).fd?f.f:'all')}
 function nAct(a){const n=nt(NS.sel);if(!n)return;
@@ -892,16 +898,34 @@ function nCount(id){return S.notes.filter(n=>!n.fd&&!n.del&&n.f===id).length+S.n
 const fpath=id=>{const a=[];let f=nt(id),g=0;while(f&&f.fd&&g++<30){a.unshift(f.t||'Folder');f=f.f&&nt(f.f)}return a.join(' / ')};
 const fdesc=id=>{const r=new Set([id]);let ch=1;while(ch){ch=0;for(const f of S.notes)if(f.fd&&f.f!=null&&r.has(f.f)&&!r.has(f.id)){r.add(f.id);ch=1}}return r};
 const fMod=f=>{const r=fdesc(f.id);let m=f.m||f.c||0;for(const x of S.notes){if(x.fd){if(r.has(x.id))m=Math.max(m,x.m||x.c||0)}else if(!x.del&&x.f!=null&&r.has(x.f))m=Math.max(m,x.m||0)}return m};
-function nList(){const q=NS.q.trim().toLowerCase(),del=NS.f==='del',cf=nCf(),live=S.notes.filter(n=>!n.fd);
- const L=q?live.filter(n=>!n.del&&nx(n).includes(q)):del?live.filter(n=>n.del):live.filter(n=>!n.del&&nIn(n,cf));
- L.sort((a,b)=>(del?0:(b.pin|0)-(a.pin|0))||b.m-a.m);let h='',last='';
- if(!q&&!del){for(const f of S.notes.filter(n=>n.fd&&nIn(n,cf)).sort((a,b)=>fMod(b)-fMod(a)))h+=`<div class="ni nfr" data-fid="${f.id}">${ic('folder')}<span class="fn" dir="auto">${esc(f.t||'Folder')}</span><span class="m">${nCount(f.id)}</span>${ic('chr')}</div>`;
-  if(cf===null)h+=`<div class="ni nfr" data-fid="del">${ic('trash')}<span class="fn">Recently Deleted</span><span class="m">${live.filter(n=>n.del).length}</span>${ic('chr')}</div>`}
- for(const n of L){const g=!del&&n.pin?'Pinned':nBk(n.m),fq=(q||del)&&n.f&&nt(n.f)&&nt(n.f).fd?fpath(n.f):'',fo=fq?`<span class="nft">${esc(fq)} · </span>`:'';if(g!==last){h+=`<div class="nsec">${g}</div>`;last=g}
-  h+=`<div class="ni${n.id===NS.sel?' sel':''}" data-id="${n.id}"><div class="nt" dir="auto">${esc(n.t||'New Note')}</div><div class="np" dir="auto"><b>${nDt(n.m)}</b> ${fo}${esc(n.p||'No additional text')}</div></div>`}
+const nEx=id=>(V.nx||[]).includes(id);
+function nExp(id,on){if(id==null)return;const a=V.nx=V.nx||[],i=a.indexOf(id);if(on&&i<0)a.push(id);else if(!on&&i>=0)a.splice(i,1)}
+function nExpTo(id){let f=id!=null?nt(id):null,g=0;while(f&&f.fd&&g++<30){nExp(f.id,1);f=f.f!=null?nt(f.f):null}}
+function nTogF(id){nExp(id,!nEx(id));NS.tf=id;save();nList()}
+function nFoldAll(){const F=S.notes.filter(x=>x.fd),cl=F.some(f=>!nEx(f.id));F.forEach(f=>nExp(f.id,cl));save();nList()}
+function nFo(id,b){const f=nt(id);if(!f||!f.fd)return;NS.tf=id;
+ popMenu(b,[{ic:'nw',t:'New note here',fn:()=>{NS.tf=id;nNew()}},
+  {ic:'plus',t:'New subfolder…',fn:()=>askText('New folder','',v=>{v=v.trim();if(!v)return;const k=nMkFolder(v,id);nExp(id,1);nExp(k,1);NS.tf=k;save();renderNotes()})},
+  {ic:'edit',t:'Rename folder',fn:()=>askText('Rename folder',f.t,v=>{v=v.trim();if(v){f.t=v;f.m=Date.now();save();renderNotes()}})},
+  {ic:'folder',t:'Move folder…',fn:()=>nMoveFolder(f,b)},
+  {ic:'trash',t:'Delete folder (keep contents)',bad:1,sure:1,fn:()=>{const par=f.f!=null&&nt(f.f)&&nt(f.f).fd?f.f:null;S.notes.forEach(x=>{if(x.f===f.id)x.f=par});S.notes=S.notes.filter(x=>x!==f);nExp(f.id,0);NS.tf=par;if(par!=null)nExp(par,1);save();renderNotes()}}])}
+const nItem=(n,ind,fo)=>`<div class="ni${n.id===NS.sel?' sel':''}" data-id="${n.id}"${ind?` style="margin-inline-start:${ind}px"`:''}><div class="nt" dir="auto">${esc(n.t||'New Note')}</div><div class="np" dir="auto"><b>${nDt(n.m)}</b> ${fo||''}${esc(n.p||'No additional text')}</div></div>`;
+/* every folder with its notes, in one page; folders expand / collapse */
+function nTree(pid,d){let h='';const ind=8+d*18;
+ for(const f of S.notes.filter(x=>x.fd&&nIn(x,pid)).sort((a,b)=>fMod(b)-fMod(a))){const o=nEx(f.id);
+  h+=`<div class="ni nfr${o?' open':''}${NS.tf===f.id?' tf':''}" data-fid="${f.id}" style="margin-inline-start:${ind}px"><span class="nch">${ic('chr')}</span>${ic('folder')}<span class="fn" dir="auto">${esc(f.t||'Folder')}</span><span class="m">${nCount(f.id)}</span><button class="nfo" data-fid="${f.id}" title="Folder options">${ic('more')}</button></div>`;
+  if(o){const sub=nTree(f.id,d+1),ns=S.notes.filter(x=>!x.fd&&!x.del&&nIn(x,f.id)).sort((a,b)=>(b.pin|0)-(a.pin|0)||b.m-a.m);h+=sub;for(const n of ns)h+=nItem(n,ind+18,'');
+   if(!sub&&!ns.length)h+=`<div class="m nemp" style="margin-inline-start:${ind+28}px">Empty</div>`}}
+ return h}
+function nList(){const q=NS.q.trim().toLowerCase(),del=NS.f==='del',live=S.notes.filter(n=>!n.fd);let h='',last='';
+ const bk=n=>{const g=!del&&n.pin?'Pinned':nBk(n.m);if(g!==last){h+=`<div class="nsec">${g}</div>`;last=g}};
+ if(q||del){const L=(q?live.filter(n=>!n.del&&nx(n).includes(q)):live.filter(n=>n.del)).sort((a,b)=>(del?0:(b.pin|0)-(a.pin|0))||b.m-a.m);
+  for(const n of L){bk(n);const fq=n.f&&nt(n.f)&&nt(n.f).fd?fpath(n.f):'';h+=nItem(n,0,fq?`<span class="nft">${esc(fq)} · </span>`:'')}}
+ else{h+=nTree(null,0);h+=`<div class="ni nfr" data-fid="del">${ic('trash')}<span class="fn">Recently Deleted</span><span class="m">${live.filter(n=>n.del).length}</span>${ic('chr')}</div>`;
+  for(const n of live.filter(n=>!n.del&&nIn(n,null)).sort((a,b)=>(b.pin|0)-(a.pin|0)||b.m-a.m)){bk(n);h+=nItem(n,0,'')}}
  $('nrows').innerHTML=h||`<div class="m" style="padding:28px;text-align:center">${q?'No Results':del?'Nothing deleted':'No Notes'}</div>`;
  nChips()}
-const nRowH=(r,i)=>{const t=r[0]||'',cl=r[2]&&!nEm(r);return `<div class="nrow${cl?' cld':''}"><div class="ngr" title="Drag to move this block (Alt+Up / Alt+Down on the keyboard)">${ic('grip')}</div><button class="ntg" data-a="tg" title="Show everything / only the final lines">${ic('chr')}</button><div class="nbx"><div class="nmr" dir="auto" aria-hidden="true">${nMr(t)}</div><textarea data-r="${i}" data-c="0" dir="auto" spellcheck="true">\n${esc(t)}</textarea></div><div class="ncv" dir="auto">${nCv(t)}</div></div>`};
+const nRowH=(r,i)=>{const t=r[0]||'',cl=r[2]&&!nEm(r),ps=cl?(r[3]|0):0,pc=cl?(r[4]|0):0;return `<div class="nrow${cl?' cld':''}" data-ps="${ps}" data-pc="${pc}"><div class="ngr" title="Drag to move this block (Alt+Up / Alt+Down on the keyboard)">${ic('grip')}</div><button class="ntg" data-a="tg" title="Collapse / expand this block (collapsed: the starred lines; no star: 4 lines, or as many lines as are selected)">${ic('chr')}</button><div class="nbx"><div class="nmr" dir="auto" aria-hidden="true">${nMr(t)}</div><textarea data-r="${i}" data-c="0" dir="auto" spellcheck="true">\n${esc(t)}</textarea></div><div class="ncv" dir="auto">${nCv(t,ps,pc)}</div><button class="nxd" data-a="xd" title="Delete this block (Backspace in an empty block, or Ctrl+Shift+Backspace)">${ic('x')}</button></div>`};
 function nFit(row){if(!row)return;const t=[...row.querySelectorAll('textarea')];t.forEach(x=>x.style.height='auto');const h=Math.max(76,...t.map(x=>x.scrollHeight+2));t.forEach(x=>x.style.height=h+'px')}
 const nFitAll=()=>{const e=E();if(e)e.querySelectorAll('.nrow').forEach(nFit)};
 /* notes written with the old rich-text editor: first line stays the title, every paragraph becomes a row */
@@ -909,18 +933,31 @@ function nMig(n){const d=document.createElement('div');d.innerHTML=n.h||'';const
  if(!L.length&&d.textContent.trim())L.push(d.textContent.trim());const fi=L.findIndex(x=>x),rest=fi<0?[]:L.slice(fi+1),rows=[];let g=[];
  for(const l of rest){if(l)g.push(l);else if(g.length){rows.push([g.join('\n'),'']);g=[]}}if(g.length)rows.push([g.join('\n'),'']);return rows}
 const nrows=n=>{if(!Array.isArray(n.r))n.r=nMig(n);return n.r};
-function nNorm(n){const rows=nrows(n);rows.forEach(r=>{const b=(r[1]||'').trim();if(b)r[0]=(r[0]||'').replace(/\s+$/,'')+((r[0]||'').trim()?'\n':'')+b;r[1]='';r[2]=r[2]?1:0});return rows}
-function nBuild(n){const rows=nNorm(n),e=E();if(!n.del){const l=rows[rows.length-1];if(!l||!nEm(l))rows.push(['','',0])}
+function nNorm(n){const rows=nrows(n);rows.forEach(r=>{const b=(r[1]||'').trim();if(b)r[0]=(r[0]||'').replace(/\s+$/,'')+((r[0]||'').trim()?'\n':'')+b;r[1]='';r[2]=r[2]?1:0;if(!r[2])r.splice(3)});return rows}
+function nBuild(n){const rows=nNorm(n),e=E();if(!n.del){if(NS.ld!==n.id&&!(NP&&NP.id===n.id))while(rows.length>1&&nEm(rows[rows.length-1]))rows.pop();if(!rows.length)rows.push(['','',0])}
  $('ntl').value=n.t||'';e.innerHTML=rows.map(nRowH).join('');NS.ld=n.id;const ro=!!n.del;$('ntl').readOnly=ro;e.querySelectorAll('textarea').forEach(t=>t.readOnly=ro);nFitAll()}
 const nReidx=()=>[...E().children].forEach((row,i)=>row.querySelectorAll('textarea').forEach(x=>x.dataset.r=i));
 function nAddRow(n,at){const e=E();if(at==null||at>n.r.length)at=n.r.length;n.r.splice(at,0,['','',0]);const h=nRowH(['',''],at);if(at===0)e.insertAdjacentHTML('afterbegin',h);else e.children[at-1].insertAdjacentHTML('afterend',h);nReidx();nFit(e.children[at])}
 /* empty rows disappear on their own (the last row always stays, as the place for the next line) */
+/* delete a block (a note always keeps one empty block at the end, as the place for the next line) */
+function nDelRow(n,i,foc){const e=E(),row=e.children[i];if(!row||!n.r[i])return;n.r.splice(i,1);row.remove();
+ if(!n.r.length)nAddRow(n,0);else nReidx();nCommit(n);
+ if(foc){const k=i>0?i-1:0,x=e.querySelector(`textarea[data-r="${k}"]`);if(x){if(n.r[k]&&n.r[k][2])nSetCl(n,k,0);x.focus();const q=i>0?x.value.length:0;x.setSelectionRange(q,q)}}}
+function nXd(b){const n=nt(NS.sel);if(!n||n.del)return;const row=b.closest('.nrow'),i=[...E().children].indexOf(row);if(i<0||!n.r[i])return;
+ if(nEm(n.r[i])&&n.r.length===1)return;
+ if(!nEm(n.r[i])&&!b.classList.contains('sure')){b.classList.add('sure');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('sure'),2500);return}
+ nDelRow(n,i,false)}
 function nPrune(n){if(!n||n.del||!Array.isArray(n.r))return;const e=E(),ae=document.activeElement;let ch=0;
- for(let i=n.r.length-2;i>=0;i--){const row=e.children[i];if(!row||!nEm(n.r[i])||row.contains(ae))continue;n.r.splice(i,1);row.remove();ch=1}
+ for(let i=n.r.length-1;i>=0&&n.r.length>1;i--){const row=e.children[i];if(!row||!nEm(n.r[i])||row.contains(ae))continue;n.r.splice(i,1);row.remove();ch=1}
  if(ch){nReidx();nCommit(n)}}
 function nTail(n){if(!n||n.del||!Array.isArray(n.r))return;const l=n.r[n.r.length-1];if(l&&!nEm(l))nAddRow(n,n.r.length)}
 const nLater=()=>{clearTimeout(nTm);nTm=setTimeout(nFlush,500)};
-function nSetCl(n,i,v){const row=E().children[i];if(!row||!n.r[i])return;if(v&&nEm(n.r[i]))return;n.r[i][2]=v?1:0;row.classList.toggle('cld',!!v);if(!v)nFit(row);nLater()}
+/* preview of a collapsed block without starred lines: 4 lines, or as many lines as are selected (starting at the first selected line) */
+function nPv(n,i,row){const ta=row.querySelector('textarea'),tot=n.r[i][0].split('\n').filter(l=>mkS(l).trim()).length;let st=0,ct=4;
+ const q=nSel();if(q&&q.t===ta&&q.b>q.a&&q.T.length){ct=Math.max(4,q.T.length);st=Math.max(0,Math.min(q.L.slice(0,q.T[0]).filter(l=>mkS(l).trim()).length,tot-ct))}return[st,ct]}
+function nSetCl(n,i,v){const row=E().children[i];if(!row||!n.r[i])return;if(v&&nEm(n.r[i]))return;
+ if(v){const[st,ct]=nPv(n,i,row);n.r[i][2]=1;n.r[i][3]=st;n.r[i][4]=ct;row.dataset.ps=st;row.dataset.pc=ct;nPaint(row,n.r[i][0])}else{n.r[i][2]=0;n.r[i].splice(3);row.dataset.ps=0;row.dataset.pc=0}
+ row.classList.toggle('cld',!!v);if(!v)nFit(row);nLater()}
 function nTog(b){const n=nt(NS.sel);if(!n||n.del)return;const row=b.closest('.nrow');nSetCl(n,[...E().children].indexOf(row),!row.classList.contains('cld'))}
 function nFold(){const n=nt(NS.sel);if(!n||n.del)return;const any=n.r.some(r=>!r[2]&&!nEm(r));[...E().children].forEach((row,i)=>nSetCl(n,i,any))}
 let NK=null;const nRec=t=>{NK={t,a:t.selectionStart,b:t.selectionEnd};nSt()};
@@ -953,24 +990,25 @@ function nDragEnd(){if(!ND)return;const{n,row,i,t}=ND;ND=null;const ed=E(),other
 function nEd(){const n=nt(NS.sel),e=E();$('nee').classList.toggle('empty',!n);$('nw').dataset.v=NS.v;if(!n){e.innerHTML='';$('ntl').value='';NS.ld=0;return}
  const ae=document.activeElement,busy=ae&&(e.contains(ae)||ae===$('ntl'));if(NS.ld!==n.id||!busy)nBuild(n);
  $('nrec').style.display=n.del?'':'none';$('npin').style.display=n.del?'none':'';$('nmv').style.display=n.del?'none':'';$('npin').classList.toggle('pn',!!(NP&&NP.id===n.id));$('ndate').textContent=nDl(n);npSync()}
-function renderNotes(){const el=$('pgN');if(!el.firstChild)nInit(el);if(typeof NS.f==='number'){const f=nt(NS.f);if(!f||!f.fd)NS.f=V.nf='all'}const now=Date.now(),c0=S.notes.length;S.notes=S.notes.filter(n=>!(n.del&&now-n.del>30*DAY));
+function renderNotes(){const el=$('pgN');if(!el.firstChild)nInit(el);if(typeof NS.f==='number'){if(nt(NS.f)&&nt(NS.f).fd){NS.tf=NS.f;nExpTo(NS.f)}NS.f=V.nf='all'}const now=Date.now(),c0=S.notes.length;S.notes=S.notes.filter(n=>!(n.del&&now-n.del>30*DAY));
  if(NS.sel&&!nt(NS.sel))NS.sel=null;
- if(!NS.sel&&innerWidth>820){const del=NS.f==='del',cf=nCf(),l=S.notes.filter(n=>!n.fd&&!!n.del===del&&(del||nIn(n,cf))).sort((a,b)=>(b.pin|0)-(a.pin|0)||b.m-a.m)[0];if(l)NS.sel=l.id}
+ if(!NS.sel&&innerWidth>820){const del=NS.f==='del',l=S.notes.filter(n=>!n.fd&&!!n.del===del).sort((a,b)=>(b.pin|0)-(a.pin|0)||b.m-a.m)[0];if(l){NS.sel=l.id;const lf=l.f!=null&&nt(l.f)&&nt(l.f).fd?l.f:null;NS.tf=lf;if(lf!=null)nExpTo(lf)}}
  if(S.notes.length!==c0)save();nList();nEd()}
-function nInit(el){el.innerHTML=`<div class="nw" id="nw" data-v="l"><div class="nl"><div class="nh"><button data-a="up" id="nup" style="display:none">${ic('chl')}<span>Notes</span></button><b id="nht" dir="auto">Notes</b><span class="sp"></span><button data-a="nf" id="nnf" title="New folder">${ic('folder')}</button><button data-a="fm" id="nfmb" title="Folder options" style="display:none">${ic('more')}</button><button data-a="new" id="nnn" title="New note">${ic('nw')}</button></div><input class="nq" id="nq" type="search" dir="auto" placeholder="Search"><div class="nr" id="nrows"></div></div>
+function nInit(el){el.innerHTML=`<div class="nw" id="nw" data-v="l"><div class="nl"><div class="nh"><button data-a="up" id="nup" style="display:none">${ic('chl')}<span>Notes</span></button><b id="nht" dir="auto">Notes</b><span class="sp"></span><button data-a="fa" id="nfa" title="Expand / collapse all folders">${ic('fold')}</button><button data-a="nf" id="nnf" title="New folder">${ic('folder')}</button><button data-a="fm" id="nfmb" title="Folder options" style="display:none">${ic('more')}</button><button data-a="new" id="nnn" title="New note">${ic('nw')}</button></div><input class="nq" id="nq" type="search" dir="auto" placeholder="Search"><div class="nr" id="nrows"></div></div>
 <div class="ne" id="nee"><div class="nb"><button class="nbk" data-a="back">${ic('chl')}<span>Notes</span></button><span class="sp"></span><button class="nfx" data-a="mk" id="nmk" title="Bold + final: mark the selected lines (tap again to unmark)">${ic('star')}</button><button class="nfx" data-a="mu" id="nmu" title="Underline the selected lines">${ic('ul2')}</button><button class="nfx" data-a="ms" id="nms" title="Strike through the selected lines">${ic('st2')}</button><button data-a="fold" id="nfd" title="Fold all blocks to the final lines / unfold all">${ic('fold')}</button><button data-a="rec" id="nrec" title="Recover">${ic('rec')}</button><button data-a="mv" id="nmv" title="Move to folder">${ic('folder')}</button><button data-a="pin" id="npin" title="Pop out this note (floating window, always on top)">${ic('pin')}</button><button data-a="del" title="Delete">${ic('trash')}</button></div>
 <div class="ns"><div class="nd" id="ndate"></div><input class="ntl" id="ntl" dir="auto" placeholder="Title" autocomplete="off"><div class="nblocks" id="ned"></div></div><div class="nem">No Note Selected</div></div></div>`;
  el.addEventListener('mousedown',e=>{if(e.target.closest('.nf,.nfx'))e.preventDefault()});
  el.addEventListener('click',e=>{const li=e.target.closest('#ned li');
   if(li&&li.parentNode.classList.contains('cl')&&E().isContentEditable){const r=li.getBoundingClientRect(),x=li.parentNode.dir==='rtl'?r.right-e.clientX:e.clientX-r.left;if(x<30){e.preventDefault();li.toggleAttribute('data-c');nSave();return}}
-  const fr=e.target.closest('.nfr');if(fr){const v=fr.dataset.fid;nGo(v==='del'?'del':+v);return}
+  const fb=e.target.closest('.nfo');if(fb){nFo(+fb.dataset.fid,fb);return}
+  const fr=e.target.closest('.nfr');if(fr){const v=fr.dataset.fid;if(v==='del')nGo('del');else nTogF(+v);return}
   const r=e.target.closest('.ni');if(r){nOpen(+r.dataset.id);return}
   const cv=e.target.closest('.ncv');if(cv){const n=nt(NS.sel),row=cv.closest('.nrow');if(n&&!n.del){nSetCl(n,[...E().children].indexOf(row),0);const x=row.querySelector('textarea');x.focus();x.setSelectionRange(x.value.length,x.value.length)}return}
   const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;
   if(b.dataset.c)nCmd(b.dataset.c);else if(b.dataset.l)nLs(b.dataset.l);else if(a==='new')nNew();
   else if(a==='up')nUp();
-  else if(a==='nf')nFolderNew();else if(a==='fm')nFolderMenu(b);else if(a==='mv')nMoveMenu(b)
-  else if(a==='mk')nMark('b');else if(a==='mu')nMark('u');else if(a==='ms')nMark('s');else if(a==='fold')nFold();else if(a==='tg')nTog(b);else if(a==='back'){nLeave();NS.sel=null;NS.v='l';nList();nEd()}else if(a)nAct(a)});
+  else if(a==='nf')nFolderNew();else if(a==='fa')nFoldAll();else if(a==='fm')nFolderMenu(b);else if(a==='mv')nMoveMenu(b)
+  else if(a==='mk')nMark('b');else if(a==='mu')nMark('u');else if(a==='ms')nMark('s');else if(a==='fold')nFold();else if(a==='tg')nTog(b);else if(a==='xd')nXd(b);else if(a==='back'){nLeave();NS.sel=null;NS.v='l';nList();nEd()}else if(a)nAct(a)});
  el.addEventListener('input',e=>{const t=e.target;if(t.id==='nq'){NS.q=t.value;nList();return}
   const n=nt(NS.sel);if(!n||n.del||!Array.isArray(n.r))return;
   if(t.id==='ntl'){nCommit(n);return}
@@ -989,22 +1027,27 @@ function nInit(el){el.innerHTML=`<div class="nw" id="nw" data-v="l"><div class="
   if(t.tagName!=='TEXTAREA'||t.dataset.r===undefined||e.isComposing)return;const r=+t.dataset.r,pl=!e.shiftKey&&!e.altKey&&!e.ctrlKey&&!e.metaKey;
   const go=(x,end)=>{if(!x)return false;e.preventDefault();const k=+x.dataset.r;if(n.r[k]&&n.r[k][2])nSetCl(n,k,0);x.focus();const p=end?x.value.length:0;x.setSelectionRange(p,p);return true};
   if(e.altKey&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey&&(e.key==='ArrowUp'||e.key==='ArrowDown')){e.preventDefault();nMoveRow(n,r,r+(e.key==='ArrowUp'?-1:1),t);return}
-  /* Enter / Shift+Enter: new line inside the block; Tab: next block (created if missing) */
+  /* Enter: new block after this one; Shift+Enter: new line inside the block; Tab: next block (created if missing) */
   if((e.ctrlKey||e.metaKey)&&!e.altKey){const k=e.key.toLowerCase(),m=k==='b'?'b':k==='u'?'u':(k==='x'&&e.shiftKey)?'s':null;if(m){e.preventDefault();nMark(m);return}}
   if(e.key==='Tab'){if(e.shiftKey){if(r>0)go(at(r-1),1)}else{if(!at(r+1)){if(nEm(n.r[r])){e.preventDefault();return}nAddRow(n)}go(at(r+1),0)}if(!e.shiftKey||r>0)e.preventDefault();return}
+  if(e.key==='Backspace'&&(e.ctrlKey||e.metaKey)&&e.shiftKey&&!e.altKey){e.preventDefault();nDelRow(n,r,1);return}
   if(!pl)return;
+  /* Enter = this block is done, a new block opens right after it (Shift+Enter = new line inside the block) */
+  if(e.key==='Enter'){e.preventDefault();if(nEm(n.r[r]))return;nAddRow(n,r+1);go(at(r+1),0);return}
+  /* Backspace in an empty block deletes it and goes back to the previous block */
+  if(e.key==='Backspace'&&!t.value&&t.selectionStart===0&&t.selectionEnd===0){e.preventDefault();if(n.r.length>1)nDelRow(n,r,1);return}
   if(e.key==='ArrowDown'&&t.selectionStart===t.value.length&&t.selectionEnd===t.value.length)go(at(r+1),0);
   else if(e.key==='ArrowUp'&&t.selectionStart===0&&t.selectionEnd===0)go(at(r-1),1)});
  el.addEventListener('pointerdown',e=>{const g=e.target.closest('.ngr');if(!g)return;const n=nt(NS.sel);if(!n||n.del||!Array.isArray(n.r))return;const row=g.closest('.nrow'),ed=E(),sc=ed.closest('.ns');
   e.preventDefault();ND={n,row,i:[...ed.children].indexOf(row),y0:e.clientY,s0:sc.scrollTop,sc,t:0};ND.t=ND.i;try{g.setPointerCapture(e.pointerId)}catch(_){}row.classList.add('ndg')});
  el.addEventListener('pointermove',nDragMove);el.addEventListener('pointerup',nDragEnd);el.addEventListener('pointercancel',nDragEnd);
- el.addEventListener('focusout',e=>{if(e.target.id==='ntl'||e.target.tagName==='TEXTAREA'){if(e.target.tagName==='TEXTAREA'&&E().contains(e.target))nRec(e.target);nFlush();const n0=nt(NS.sel);setTimeout(()=>{if(n0&&NS.sel===n0.id){nPrune(n0);nTail(n0)}},0)}})}
+ el.addEventListener('focusout',e=>{if(e.target.id==='ntl'||e.target.tagName==='TEXTAREA'){if(e.target.tagName==='TEXTAREA'&&E().contains(e.target))nRec(e.target);nFlush();const n0=nt(NS.sel);setTimeout(()=>{if(n0&&NS.sel===n0.id)nPrune(n0)},0)}})}
 addEventListener('pagehide',()=>{if(nTm)nFlush()});addEventListener('resize',()=>{if(PG==='nt'&&E())nFitAll()});document.addEventListener('visibilitychange',()=>{if(document.hidden&&nTm)nFlush()});
 
 /* ================= Notes pop-out: floating always-on-top window (Document Picture-in-Picture) ================= */
 var NP=null;
 function npClose(){const w=NP&&NP.w;NP=null;try{if(w&&!w.closed)w.close()}catch(_){}const b=$('npin');if(b)b.classList.remove('pn')}
-function npBuild(n){if(!NP)return;const d=NP.w.document,rows=nNorm(n);if(!n.del&&(!rows.length||!nEm(rows[rows.length-1])))rows.push(['','',0]);
+function npBuild(n){if(!NP)return;const d=NP.w.document,rows=nNorm(n);if(!n.del&&!rows.length)rows.push(['','',0]);
  const sc=d.getElementById('pns'),top=sc.scrollTop;d.getElementById('ptl').value=n.t||'';
  const ed=d.getElementById('ped');ed.innerHTML=rows.map(nRowH).join('');ed.querySelectorAll('.nrow').forEach(nFit);sc.scrollTop=top;d.title=n.t||'Note'}
 function npSync(){if(!NP)return;const n=nt(NP.id);if(!n||n.del||NP.w.closed){npClose();return}
@@ -1018,7 +1061,7 @@ async function nPop(){const n=nt(NS.sel);if(!n||n.del)return;
  let w;try{w=await documentPictureInPicture.requestWindow({width:380,height:480})}catch(err){alert('Could not open the floating window: '+(err&&err.message||err));return}
  const d=w.document;NP={w,id:n.id,tm:0};
  document.querySelectorAll('style,link[rel=stylesheet]').forEach(x=>d.head.appendChild(x.cloneNode(true)));
- const st=d.createElement('style');st.textContent='html,body{height:100%;margin:0}body{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--tx)}#pns{flex:1;min-height:0;overflow:auto;padding:10px 12px 24px}.ngr{display:none!important}.nrow{grid-template-columns:22px minmax(0,1fr)!important;gap:4px!important}.ntl{font-size:20px!important}';
+ const st=d.createElement('style');st.textContent='html,body{height:100%;margin:0}body{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--tx)}#pns{flex:1;min-height:0;overflow:auto;padding:10px 12px 24px}.ngr,.nxd{display:none!important}.nrow{grid-template-columns:22px minmax(0,1fr)!important;gap:4px!important}.ntl{font-size:20px!important}';
  d.head.appendChild(st);
  d.body.innerHTML='<div id="pns"><input class="ntl" id="ptl" dir="auto" placeholder="Title" autocomplete="off"><div class="nblocks" id="ped"></div></div>';
  npBuild(n);const b=$('npin');if(b)b.classList.add('pn');
@@ -1031,13 +1074,20 @@ async function nPop(){const n=nt(NS.sel);if(!n||n.del)return;
  d.addEventListener('input',e=>{const t=e.target,n=cur();if(!n)return;
   if(t.id==='ptl'){$('ntl').value=t.value;nCommit(n);npMain(n);return}
   if(t.tagName==='TEXTAREA'&&t.dataset.r!==undefined){const i=+t.dataset.r,v=fix(t);if(!n.r[i])return;n.r[i][0]=v;const row=t.closest('.nrow');nPaint(row,v);nFit(row);
-   if(i===n.r.length-1&&!nEm(n.r[i])){n.r.push(['','',0]);const ed=d.getElementById('ped');ed.insertAdjacentHTML('beforeend',nRowH(['',''],n.r.length-1));nFit(ed.lastElementChild)}
    nCommit(n);npMain(n)}});
  d.addEventListener('click',e=>{const n=cur();if(!n)return;const ed=d.getElementById('ped'),tg=e.target.closest('.ntg'),cv=e.target.closest('.ncv');
   if(tg||cv){const row=(tg||cv).closest('.nrow'),i=[...ed.children].indexOf(row);if(!n.r[i])return;
    if(tg){const c=!row.classList.contains('cld');if(c&&nEm(n.r[i]))return;n.r[i][2]=c?1:0;row.classList.toggle('cld',c);if(!c)nFit(row);nLater();npMain(n)}
    else{n.r[i][2]=0;row.classList.remove('cld');nFit(row);const x=row.querySelector('textarea');x.focus();x.setSelectionRange(x.value.length,x.value.length);nLater()}}});
- d.addEventListener('keydown',e=>{const t=e.target;if(t.id==='ptl'&&(e.key==='Enter'||e.key==='Tab')){const x=d.querySelector('#ped textarea');if(x){e.preventDefault();x.focus()}}});
+ const reidx=()=>[...d.getElementById('ped').children].forEach((row,k)=>row.querySelectorAll('textarea').forEach(x=>x.dataset.r=k));
+ const addAt=(n,at)=>{const ed=d.getElementById('ped');n.r.splice(at,0,['','',0]);const h=nRowH(['',''],at);if(at===0)ed.insertAdjacentHTML('afterbegin',h);else ed.children[at-1].insertAdjacentHTML('afterend',h);reidx();nFit(ed.children[at]);return ed.children[at].querySelector('textarea')};
+ d.addEventListener('keydown',e=>{const t=e.target;if(t.id==='ptl'&&(e.key==='Enter'||e.key==='Tab')){const x=d.querySelector('#ped textarea');if(x){e.preventDefault();x.focus()}return}
+  if(t.tagName!=='TEXTAREA'||t.dataset.r===undefined||e.isComposing||e.shiftKey||e.ctrlKey||e.altKey||e.metaKey||(e.key!=='Enter'&&e.key!=='Tab'))return;
+  const n=cur();if(!n)return;e.preventDefault();const i=+t.dataset.r,ed=d.getElementById('ped');
+  if(e.key==='Enter'){if(nEm(n.r[i]))return;addAt(n,i+1).focus();return}
+  let x=ed.querySelector(`textarea[data-r="${i+1}"]`);if(!x){if(nEm(n.r[i]))return;x=addAt(n,i+1)}x.focus()});
+ d.addEventListener('focusout',()=>setTimeout(()=>{const n=cur();if(!n||NP.w.closed)return;const ed=d.getElementById('ped'),ae=d.activeElement;let ch=0;
+  for(let i=n.r.length-1;i>=0&&n.r.length>1;i--){const row=ed.children[i];if(!row||!nEm(n.r[i])||row.contains(ae))continue;n.r.splice(i,1);row.remove();ch=1}if(ch){reidx();nCommit(n)}},0));
  w.addEventListener('pagehide',()=>{if(!NP||NP.w!==w)return;const id=NP.id;clearTimeout(NP.tm);NP=null;nFlush();const b=$('npin');if(b)b.classList.remove('pn');
   const m=nt(id);if(m&&!m.del&&NS.sel===id)nBuild(m)})}
 
@@ -1065,18 +1115,18 @@ function mMenu(b,id){const n=itm(id);if(!n)return;const p=isP(id);
  popMenu(b,[!p&&{ic:'est',t:n.est?'Mark as exact amount':'Mark as estimate',fn:()=>mEst(id)},{ic:n.hid?'eyeoff':'eye',t:n.hid?'Count in totals':'Ignore in totals',fn:()=>mHide(id)},{ic:'plus',t:'Add item below',fn:()=>{MF.sel=[id];mAdd()}},{ic:'trash',t:'Delete',bad:1,sure:1,fn:()=>{MF.del=id;mDel(id)}}].filter(Boolean))}
 function mEst(id){const n=itm(id);if(!n)return;hist();n.est=!n.est;save();renderMoney()}
 function nMkFolder(name,par){const t=Date.now(),id=nid();S.notes.push({id,fd:1,t:name,c:t,m:t,del:0,f:par==null?null:par});return id}
-function nChips(){const b=$('nht');if(!b)return;const cur=NS.f,f=nCf()!==null?nt(cur):null,p=f&&f.f&&nt(f.f)&&nt(f.f).fd?nt(f.f):null;
- b.textContent=cur==='del'?'Recently Deleted':f?(f.t||'Folder'):'Notes';
- $('nup').style.display=cur==='all'?'none':'';$('nup').querySelector('span').textContent=p?(p.t||'Folder'):'Notes';
- $('nfmb').style.display=f?'':'none';$('nnf').style.display=cur==='del'?'none':'';$('nnn').style.display=cur==='del'?'none':''}
-function nFolderNew(){askText('New folder','',v=>{v=v.trim();if(!v)return;nMkFolder(v,nCf());save();renderNotes()})}
+function nChips(){const b=$('nht');if(!b)return;const cur=NS.f;b.textContent=cur==='del'?'Recently Deleted':'Notes';
+ $('nup').style.display=cur==='all'?'none':'';$('nup').querySelector('span').textContent='Notes';
+ $('nfmb').style.display='none';$('nnf').style.display=cur==='del'?'none':'';$('nnn').style.display=cur==='del'?'none':'';
+ const fa=$('nfa');if(fa)fa.style.display=cur==='all'&&S.notes.some(x=>x.fd)?'':'none'}
+function nFolderNew(){askText('New folder','',v=>{v=v.trim();if(!v)return;const k=nMkFolder(v,null);nExp(k,1);NS.tf=k;save();renderNotes()})}
 function nFolderMenu(b){const f=nCf()!==null?nt(NS.f):null;if(!f||!f.fd)return;
  popMenu(b,[{ic:'edit',t:'Rename folder',fn:()=>askText('Rename folder',f.t,v=>{v=v.trim();if(v){f.t=v;f.m=Date.now();save();renderNotes()}})},{ic:'folder',t:'Move folder…',fn:()=>nMoveFolder(f)},{ic:'trash',t:'Delete folder (keep contents)',bad:1,sure:1,fn:()=>{const par=f.f&&nt(f.f)&&nt(f.f).fd?f.f:null;S.notes.forEach(x=>{if(x.f===f.id)x.f=par});S.notes=S.notes.filter(x=>x!==f);NS.f=V.nf=par===null?'all':par;NS.sel=null;NS.v='l';save();renderNotes()}}])}
-function nMoveFolder(f){const bad=fdesc(f.id),F=S.notes.filter(x=>x.fd&&!bad.has(x.id)).sort((a,c)=>fpath(a.id).localeCompare(fpath(c.id)));
- const mv=p=>{f.f=p;save();NS.f=V.nf=f.id;renderNotes()};
- setTimeout(()=>popMenu($('nfmb'),[{ic:!f.f?'done':'folder',t:'Top level',fn:()=>mv(null)},...F.map(x=>({ic:f.f===x.id?'done':'folder',t:fpath(x.id),fn:()=>mv(x.id)}))]),0)}
+function nMoveFolder(f,b){const bad=fdesc(f.id),F=S.notes.filter(x=>x.fd&&!bad.has(x.id)).sort((a,c)=>fpath(a.id).localeCompare(fpath(c.id)));
+ const mv=p=>{f.f=p;if(p!=null)nExpTo(p);NS.tf=f.id;save();renderNotes()};
+ setTimeout(()=>popMenu(b,[{ic:!f.f?'done':'folder',t:'Top level',fn:()=>mv(null)},...F.map(x=>({ic:f.f===x.id?'done':'folder',t:fpath(x.id),fn:()=>mv(x.id)}))]),0)}
 function nMoveMenu(b){const n=nt(NS.sel);if(!n||n.del)return;const F=S.notes.filter(x=>x.fd).sort((a,c)=>fpath(a.id).localeCompare(fpath(c.id)));
- const mv=f=>{n.f=f;save();if(!NS.q&&!nIn(n,nCf())){NS.sel=null;NS.v='l'}renderNotes()};
+ const mv=f=>{n.f=f;if(f!=null)nExpTo(f);NS.tf=f;save();renderNotes()};
  popMenu(b,[{ic:!n.f?'done':'folder',t:'No folder',fn:()=>mv(null)},...F.map(f=>({ic:n.f===f.id?'done':'folder',t:fpath(f.id),fn:()=>mv(f.id)})),{ic:'plus',t:'New folder…',fn:()=>askText('New folder','',v=>{v=v.trim();if(v)mv(nMkFolder(v,null))})}])}
 (function(){const p=$('pp');let y0=null,dy=0;
  p.addEventListener('pointerdown',e=>{if(innerWidth>820||!e.target.closest('.grab,.ph')||e.target.closest('button'))return;y0=e.clientY;dy=0;p.style.transition='none';try{p.setPointerCapture(e.pointerId)}catch(_){}});
